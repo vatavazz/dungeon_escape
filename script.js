@@ -190,10 +190,16 @@ function InitDemo() {
 	//
 	var identityMatrix = new Float32Array(16);
 	mat4.identity(identityMatrix);
+
+	var rotateX = new Float32Array(16);
+	var rotateY = new Float32Array(16);
+
 	var angle = 0;
 	var loop = function() {
 		angle = performance.now() / 6000 * (2 * Math.PI);
-		mat4.rotate(worldMatrix, identityMatrix, angle, [-1,1,0]);
+		mat4.rotate(rotateY, identityMatrix, angle, [0,1,0]);
+		mat4.rotate(rotateX, identityMatrix, angle/4, [1,0,0]);
+		mat4.mul(worldMatrix, rotateY, rotateX);
 		gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
 
 		gl.clearColor(0.7, 0.8, 0.85, 1);
