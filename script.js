@@ -1,5 +1,4 @@
-var vertexShaderText =
-[
+var vertexShaderText = [
 	'precision mediump float;',
 	'',
 	'attribute vec3 vertPosition;',
@@ -9,20 +8,17 @@ var vertexShaderText =
 	'uniform mat4 mView;',
 	'uniform mat4 mProj;',
 	'',
-	'void main()',
-	'{',
+	'void main() {',
 	'	fragColor = vertColor;',
 	'	gl_Position = mProj * mView * mWorld * vec4(vertPosition, 1.0);',
 	'}'
 ].join('\n');
 
-var fragmentShaderText =
-[
+var fragmentShaderText = [
 	'precision mediump float;',
 	'',
 	'varying vec3 fragColor;',
-	'void main()',
-	'{',
+	'void main() {',
 	'	gl_FragColor = vec4(fragColor, 1.0);',
 	'}'
 ].join('\n');
@@ -56,7 +52,7 @@ function InitDemo() {
 			console.error('ERROR compiling vertex shader!', gl.getShaderInfoLog(vertexShader));
 			return;
 		}
-		if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
+	if (!gl.getShaderParameter(fragmentShader, gl.COMPILE_STATUS)) {
 		console.error('ERROR compiling fragment shader!', gl.getShaderInfoLog(fragmentShader));
 		return;
 	}
@@ -68,46 +64,44 @@ function InitDemo() {
 	// if (!gl.getProgramParameter(program, gl.LINK_STATUS)) { console.log(gl.getProgramInfoLog(program)); }
 	gl.validateProgram(program);
 
-	//
-	// create buffer
-	//
+	// buffers = for use with GPU
 	var boxVertices =
 	[ // X, Y, Z           R, G, B
 		// Top
-		-1.0, 1.0, -1.0,   0.5, 0.5, 0.5,
-		-1.0, 1.0, 1.0,    0.5, 0.5, 0.5,
-		1.0, 1.0, 1.0,     0.5, 0.5, 0.5,
-		1.0, 1.0, -1.0,    0.5, 0.5, 0.5,
+		-1.0, 1.0, -1.0,   0.7, 0.2, 0.5,
+		-1.0, 1.0, 1.0,    0.5, 0.5, 0.3,
+		1.0, 1.0, 1.0,     0.5, 0.1, 0.5,
+		1.0, 1.0, -1.0,    0.4, 0.5, 0.5,
 
 		// Left
-		-1.0, 1.0, 1.0,    0.75, 0.25, 0.5,
-		-1.0, -1.0, 1.0,   0.75, 0.25, 0.5,
-		-1.0, -1.0, -1.0,  0.75, 0.25, 0.5,
-		-1.0, 1.0, -1.0,   0.75, 0.25, 0.5,
+		-1.0, 1.0, 1.0,    0.25, 0.25, 0.5,
+		-1.0, -1.0, 1.0,   0.175, 0.25, 0.5,
+		-1.0, -1.0, -1.0,  0.754, 0.25, 0.5,
+		-1.0, 1.0, -1.0,   0.575, 0.25, 0.5,
 
 		// Right
-		1.0, 1.0, 1.0,    0.25, 0.25, 0.75,
-		1.0, -1.0, 1.0,   0.25, 0.25, 0.75,
-		1.0, -1.0, -1.0,  0.25, 0.25, 0.75,
-		1.0, 1.0, -1.0,   0.25, 0.25, 0.75,
+		1.0, 1.0, 1.0,    0.25, 0.325, 0.725,
+		1.0, -1.0, 1.0,   0.25, 0.254, 0.575,
+		1.0, -1.0, -1.0,  0.25, 0.425, 0.275,
+		1.0, 1.0, -1.0,   0.25, 0.9285, 0.775,
 
 		// Front
-		1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
-		1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
-		-1.0, -1.0, 1.0,    1.0, 0.0, 0.15,
-		-1.0, 1.0, 1.0,    1.0, 0.0, 0.15,
+		1.0, 1.0, 1.0,     1.0, 0.0, 0.145,
+		1.0, -1.0, 1.0,    1.0, 0.0, 0.315,
+		-1.0, -1.0, 1.0,   1.0, 0.0, 0.915,
+		-1.0, 1.0, 1.0,    1.0, 0.0, 0.615,
 
 		// Back
-		1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
-		1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
-		-1.0, -1.0, -1.0,    0.0, 1.0, 0.15,
-		-1.0, 1.0, -1.0,    0.0, 1.0, 0.15,
+		1.0, 1.0, -1.0,    	0.30, 0.20, 0.415,
+		1.0, -1.0, -1.0,    0.50, 0.10, 0.715,
+		-1.0, -1.0, -1.0,   0.70, 0.60, 0.215,
+		-1.0, 1.0, -1.0,    0.20, 0.50, 0.415,
 
 		// Bottom
-		-1.0, -1.0, -1.0,   0.5, 0.5, 1.0,
-		-1.0, -1.0, 1.0,    0.5, 0.5, 1.0,
-		1.0, -1.0, 1.0,     0.5, 0.5, 1.0,
-		1.0, -1.0, -1.0,    0.5, 0.5, 1.0,
+		-1.0, -1.0, -1.0,   0.35, 0.55, 0.80,
+		-1.0, -1.0, 1.0,    0.55, 0.75, 1.60,
+		1.0, -1.0, 1.0,     0.75, 0.15, 0.50,
+		1.0, -1.0, -1.0,    0.25, 0.35, 0.30,
 	];
 
 	var boxIndices =
@@ -149,11 +143,11 @@ function InitDemo() {
 	var colorAttribLocation = gl.getAttribLocation(program, 'vertColor');
 	gl.vertexAttribPointer(
 		positionAttribLocation,
-		3,
-		gl.FLOAT,
-		gl.FALSE,
-		6 * Float32Array.BYTES_PER_ELEMENT,
-		0
+		3, // n of elemennts
+		gl.FLOAT, // type
+		gl.FALSE, // i dont remember actually
+		6 * Float32Array.BYTES_PER_ELEMENT, // size
+		0 // offset
 	);
 
 	gl.vertexAttribPointer(
@@ -198,7 +192,7 @@ function InitDemo() {
 	var loop = function() {
 		angle = performance.now() / 6000 * (2 * Math.PI);
 		mat4.rotate(rotateY, identityMatrix, angle, [0,1,0]);
-		mat4.rotate(rotateX, identityMatrix, angle/4, [1,0,0]);
+		mat4.rotate(rotateX, identityMatrix, angle, [1,0,0]);
 		mat4.mul(worldMatrix, rotateY, rotateX);
 		gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
 
@@ -212,3 +206,9 @@ function InitDemo() {
 	gl.drawArrays(gl.TRIANGLES, 0, 3);
 
 };
+// trying out user itneraction here
+// var mouseDragged = function() {
+//     angleX = mouseX - pmouseX;
+//     angleY = mouseY - pmouseY;
+// 		requestAnimationFrame(loop);
+// };
