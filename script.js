@@ -16,8 +16,18 @@ function initialise() {
 
 	var geometry = new THREE.BoxGeometry( 1, 1, 1 );
 	var material = new THREE.MeshBasicMaterial( { color: 0xaadbeb } );
-	var cube = new THREE.Mesh( geometry, material );
-	scene.add( cube );
+	//var cube = new THREE.Mesh( geometry, material );
+	//scene.add( cube );
+
+	var cube = null;
+	//function initMesh() {
+		var loader = new THREE.JSONLoader();
+		var loader = new THREE.JSONLoader();
+    loader.load('./goku.json', function(geometry) {
+        cube = new THREE.Mesh(geometry, material);
+        scene.add(cube);
+    });
+	//}
 
 	camera.position.z = 5;
 
@@ -43,7 +53,7 @@ function initialise() {
 		cube.rotation.x += dY;
 		cube.rotation.y += dX;
 		old_x = e.pageX, old_y = e.pageY;
-		e.preventDefault();
+		e.defaultPrevented();
 	};
 
 	var keyPress = function(e) {
