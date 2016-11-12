@@ -29,7 +29,7 @@ function initialise() {
 	// //}
 	var cube = null;
 	var loader = new THREE.ObjectLoader();
-	loader.load( 'skull.json', function ( object ) {
+	loader.load( './skull.json', function ( object ) {
 		cube = object;
 		scene.add( cube );
 		cube.scale = new THREE.Vector3(0.1, 0.1, 0.1);
