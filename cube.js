@@ -185,48 +185,12 @@ function InitDemo() {
 	var rotateX = new Float32Array(16);
 	var rotateY = new Float32Array(16);
 
-	var AMORTIZATION = 0.95;
-	var drag = false;
-	var old_x;
-	var old_y;
-	var dX = 0;
-	var dY = 0;
-	var THETA = 0;
-	var PHI = 0;
-
-	var mouseDown = function(e) {
-		drag = true;
-		old_x = e.pageX, old_y = e.pageY;
-		e.preventDefault();
-		return false;
-	};
-
-	var mouseUp = function(e){ drag = false; };
-
-	var mouseMove = function(e) {
-		if (!drag) return false;
-		dX = (e.pageX-old_x)*2*Math.PI/canvas.width,
-		dY = (e.pageY-old_y)*2*Math.PI/canvas.height;
-		THETA += dX;
-		PHI += dY;
-		old_x = e.pageX, old_y = e.pageY;
-		e.preventDefault();
-	};
-
-	canvas.addEventListener("mousedown", mouseDown, false);
-	canvas.addEventListener("mouseup", mouseUp, false);
-	canvas.addEventListener("mouseout", mouseUp, false);
-	canvas.addEventListener("mousemove", mouseMove, false);
-
 	var angle = 0;
 	var loop = function() {
-		//angle = performance.now() / 6000 * (2 * Math.PI);
-		angle += THETA;
-		if (drag) {
-			mat4.rotate(rotateY, identityMatrix, THETA, [0,1,0]);
-			mat4.rotate(rotateX, identityMatrix, -PHI, [1,0,0]);
-			mat4.mul(worldMatrix, rotateY, rotateX);
-		}
+		angle = performance.now() / 6000 * (2 * Math.PI);
+		mat4.rotate(rotateY, identityMatrix, angle, [0,1,0]);
+		mat4.rotate(rotateX, identityMatrix, angle, [1,0,0]);
+		mat4.mul(worldMatrix, rotateY, rotateX);
 		gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
 
 		gl.clearColor(0.7, 0.8, 0.85, 1);
@@ -235,7 +199,6 @@ function InitDemo() {
 
 		requestAnimationFrame(loop);
 	};
-
 	requestAnimationFrame(loop);
 	gl.drawArrays(gl.TRIANGLES, 0, 3);
 
@@ -247,3 +210,9 @@ function InitDemo() {
 //     angleY = mouseY - pmouseY;
 // 		requestAnimationFrame(loop);
 // };
+
+$( "#game-surface" ).keydown(function(event) {
+	if (event == 37) {
+
+	}
+});
