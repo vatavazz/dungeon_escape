@@ -19,15 +19,21 @@ function initialise() {
 	//var cube = new THREE.Mesh( geometry, material );
 	//scene.add( cube );
 
+	// var cube = null;
+	// //function initMesh() {
+	// 	var loader = new THREE.ObjectLoader();
+  //   loader.load('./skull.json', function(geometry) {
+  //       cube = new THREE.Mesh(geometry, material);
+  //       scene.add(cube);
+  //   });
+	// //}
 	var cube = null;
-	//function initMesh() {
-		var loader = new THREE.JSONLoader();
-		var loader = new THREE.JSONLoader();
-    loader.load('./goku.json', function(geometry) {
-        cube = new THREE.Mesh(geometry, material);
-        scene.add(cube);
-    });
-	//}
+	var loader = new THREE.ObjectLoader();
+	loader.load( 'skull.json', function ( object ) {
+		cube = object;
+		scene.add( cube );
+		cube.scale = new THREE.Vector3(0.1, 0.1, 0.1);
+	});
 
 	camera.position.z = 5;
 
@@ -36,7 +42,6 @@ function initialise() {
 	var old_y;
 	var dX = 0;
 	var dY = 0;
-
 	var mouseDown = function(e) {
 		// prevent other click functions from being executed
 		e.preventDefault();
@@ -53,9 +58,8 @@ function initialise() {
 		cube.rotation.x += dY;
 		cube.rotation.y += dX;
 		old_x = e.pageX, old_y = e.pageY;
-		e.defaultPrevented();
+		e.preventDefault();
 	};
-
 	var keyPress = function(e) {
 		if (e.keyCode == 37) { // left
 			cube.translateX(-0.05); }
@@ -66,7 +70,6 @@ function initialise() {
 		if (e.keyCode == 40) { // down
 			cube.translateY(-0.05); }
 	}
-
 	var mouseWheel = function(e) {
 		if (e.deltaY > 0) { cube.scale.add(new THREE.Vector3(0.1, 0.1, 0.1)); }
 		if (e.deltaY < 0) { cube.scale.sub(new THREE.Vector3(0.1, 0.1, 0.1)); }
