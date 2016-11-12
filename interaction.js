@@ -258,15 +258,6 @@ function InitDemo() {
 		scaled[0]-=e.deltaY/100;
 		scaled[1]-=e.deltaY/100;
 		scaled[2]-=e.deltaY/100;
-		
-		if (scaled[0] > 2) scaled[0] = 2;
-		if (scaled[1] > 2) scaled[1] = 2;
-		if (scaled[2] > 2) scaled[2] = 2;
-
-		if (scaled[0] < 0.5) scaled[0] = 0.5;
-		if (scaled[1] < 0.5) scaled[1] = 0.5;
-		if (scaled[2] < 0.5) scaled[2] = 0.5;
-
 		wheel = true;
 	}
 
