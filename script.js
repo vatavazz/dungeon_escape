@@ -191,8 +191,8 @@ function InitDemo() {
 	var old_y;
 	var dX = 0;
 	var dY = 0;
-	var THETA = 0;
-	var PHI = 0;
+	var angleY = 0;
+	var angleX = 0;
 
 	var mouseDown = function(e) {
 		drag = true;
@@ -207,24 +207,50 @@ function InitDemo() {
 		if (!drag) return false;
 		dX = (e.pageX-old_x)*2*Math.PI/canvas.width,
 		dY = (e.pageY-old_y)*2*Math.PI/canvas.height;
-		THETA += dX;
-		PHI += dY;
+		angleY += dX;
+		angleX += dY;
 		old_x = e.pageX, old_y = e.pageY;
 		e.preventDefault();
 	};
+
+	var keyPress = function(e) {
+		if (e.keyCode == 37) { // left
+			mat4.rotate(rotateX, identityMatrix, -angleX, [1,0,0]);
+		}
+		if (e.keyCode == 38) { // up
+
+		}
+		if (e.keyCode == 39) { // right
+
+		}
+		if (e.keyCode == 40) { // down
+
+		}
+	}
+
+	var touchStart = function(e) {
+		alert("banana");
+	}
+	var touchMove = function(e) {}
+	var touchEnd = function(e) {}
 
 	canvas.addEventListener("mousedown", mouseDown, false);
 	canvas.addEventListener("mouseup", mouseUp, false);
 	canvas.addEventListener("mouseout", mouseUp, false);
 	canvas.addEventListener("mousemove", mouseMove, false);
 
-	var angle = 0;
+	document.addEventListener("keydown", keyPress, false);
+
+	canvas.addEventListener("touchstart", touchStart, false);
+	canvas.addEventListener("touchmove", touchMove, false);
+	canvas.addEventListener("touchend", touchEnd, false);
+
 	var loop = function() {
-		//angle = performance.now() / 6000 * (2 * Math.PI);
-		angle += THETA;
 		if (drag) {
-			mat4.rotate(rotateY, identityMatrix, THETA, [0,1,0]);
-			mat4.rotate(rotateX, identityMatrix, -PHI, [1,0,0]);
+			// alternative
+			//mat4.rotate(rotateY, identityMatrix, angleY, [0,1,0]);
+			mat4.rotateY(rotateY, identityMatrix, angleY);
+			mat4.rotateX(rotateX, identityMatrix, angleX);
 			mat4.mul(worldMatrix, rotateY, rotateX);
 		}
 		gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
@@ -240,10 +266,3 @@ function InitDemo() {
 	gl.drawArrays(gl.TRIANGLES, 0, 3);
 
 };
-
-// trying out user itneraction here w processing.js
-// var mouseDragged = function() {
-//     angleX = mouseX - pmouseX;
-//     angleY = mouseY - pmouseY;
-// 		requestAnimationFrame(loop);
-// };
