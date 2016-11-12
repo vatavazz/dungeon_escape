@@ -14,28 +14,16 @@ function initialise() {
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.body.appendChild( renderer.domElement );
 
-	var geometry = new THREE.BoxGeometry( 1, 1, 1 );
-	var material = new THREE.MeshBasicMaterial( { color: 0xaadbeb } );
-	//var cube = new THREE.Mesh( geometry, material );
-	//scene.add( cube );
-
-	// var cube = null;
-	// //function initMesh() {
-	// 	var loader = new THREE.ObjectLoader();
-  //   loader.load('./skull.json', function(geometry) {
-  //       cube = new THREE.Mesh(geometry, material);
-  //       scene.add(cube);
-  //   });
-	// //}
 	var cube = null;
 	var loader = new THREE.ObjectLoader();
 	loader.load( './skull.json', function ( object ) {
 		cube = object;
 		scene.add( cube );
-		cube.scale = new THREE.Vector3(0.1, 0.1, 0.1);
+		cube.rotation.y = 3.2;
+		cube.rotation.x = 0.5;
 	});
 
-	camera.position.z = 5;
+	camera.position.z = 13;
 
 	var drag = false;
 	var old_x;
