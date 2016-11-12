@@ -1,3 +1,11 @@
+// QUICK FINDING CHEATSHEET
+// camera view (adjust camera position)
+// rotation
+// translation
+// events (user interaction)
+// touchscreen support
+// !IMPROVE (stuff to imrpove n fix)
+
 var vertexShaderText = [
 	'precision mediump float;',
 	'',
@@ -171,7 +179,9 @@ function InitDemo() {
 	var viewMatrix = new Float32Array(16);
 	var projMatrix = new Float32Array(16);
 	mat4.identity(worldMatrix);
-	mat4.lookAt(viewMatrix, [0, 0, -5], [0, 0, 0], [0, 1, 0]);
+
+	// camera view
+	mat4.lookAt(viewMatrix, [0, 0, -8], [0, 0, 0], [0, 1, 0]);
 	mat4.perspective(projMatrix, glMatrix.toRadian(45), canvas.width / canvas.height, 0.1, 1000);
 
 	gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
@@ -184,8 +194,15 @@ function InitDemo() {
 
 	var rotateX = new Float32Array(16);
 	var rotateY = new Float32Array(16);
+	var mTranslate = new Float32Array(16);
+	var mScale = new Float32Array(16);
 
-	var AMORTIZATION = 0.95;
+	// !IMPROVE
+	mat4.identity(rotateX);
+	mat4.identity(rotateY);
+	mat4.identity(mTranslate);
+	mat4.identity(mScale);
+
 	var drag = false;
 	var old_x;
 	var old_y;
@@ -195,9 +212,10 @@ function InitDemo() {
 	var angleX = 0;
 
 	var mouseDown = function(e) {
+		// prevent other click functions from being executed
+		e.preventDefault();
 		drag = true;
 		old_x = e.pageX, old_y = e.pageY;
-		e.preventDefault();
 		return false;
 	};
 
@@ -213,26 +231,41 @@ function InitDemo() {
 		e.preventDefault();
 	};
 
+	var pressed = false;
+	var translation = [0, 0, 0];
 	var keyPress = function(e) {
+		pressed = true;
+
 		if (e.keyCode == 37) { // left
-			mat4.rotate(rotateX, identityMatrix, -angleX, [1,0,0]);
+			translation[0] += 0.1;
 		}
 		if (e.keyCode == 38) { // up
-
+			translation[1] += 0.1;
 		}
 		if (e.keyCode == 39) { // right
-
+			translation[0] -= 0.1;
 		}
 		if (e.keyCode == 40) { // down
-
+			translation[1] -= 0.1;
 		}
 	}
-
-	var touchStart = function(e) {
-		alert("banana");
+	var keyUp = function() {
+		pressed = false;
 	}
-	var touchMove = function(e) {}
-	var touchEnd = function(e) {}
+	var wheel = false;
+	var scaled = [1,1,1];
+	var mouseWheel = function(e) {
+		scaled[0]-=e.deltaY/100;
+		scaled[1]-=e.deltaY/100;
+		scaled[2]-=e.deltaY/100;
+		wheel = true;
+	}
+
+	// var touchStart = function(e) {
+	//
+	// }
+	// var touchMove = function(e) {}
+	// var touchEnd = function(e) {}
 
 	canvas.addEventListener("mousedown", mouseDown, false);
 	canvas.addEventListener("mouseup", mouseUp, false);
@@ -240,10 +273,14 @@ function InitDemo() {
 	canvas.addEventListener("mousemove", mouseMove, false);
 
 	document.addEventListener("keydown", keyPress, false);
+	canvas.addEventListener("wheel", mouseWheel);
 
-	canvas.addEventListener("touchstart", touchStart, false);
-	canvas.addEventListener("touchmove", touchMove, false);
-	canvas.addEventListener("touchend", touchEnd, false);
+	// touchscreen support
+
+	// canvas.addEventListener("touchstart", touchStart, false);
+	// canvas.addEventListener("touchmove", touchMove, false);
+	// canvas.addEventListener("touchend", touchEnd, false);
+
 
 	var loop = function() {
 		if (drag) {
@@ -251,8 +288,21 @@ function InitDemo() {
 			//mat4.rotate(rotateY, identityMatrix, angleY, [0,1,0]);
 			mat4.rotateY(rotateY, identityMatrix, angleY);
 			mat4.rotateX(rotateX, identityMatrix, angleX);
-			mat4.mul(worldMatrix, rotateY, rotateX);
 		}
+
+		if (pressed) {
+			mat4.translate(mTranslate, identityMatrix, translation);
+		}
+
+		if (wheel) {
+			mat4.scale(mScale, identityMatrix, scaled);
+			wheel = false;
+		}
+
+		mat4.mul(worldMatrix, mTranslate, rotateY);
+		mat4.mul(worldMatrix, worldMatrix, rotateX);
+		mat4.mul(worldMatrix, worldMatrix, mScale);
+
 		gl.uniformMatrix4fv(matWorldUniformLocation, gl.FALSE, worldMatrix);
 
 		gl.clearColor(0.7, 0.8, 0.85, 1);
