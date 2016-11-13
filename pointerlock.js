@@ -25,6 +25,17 @@
 		});
 	}
 
+  function mouseMove( event ) {
+
+  	// calculate mouse position in normalized device coordinates
+  	// (-1 to +1) for both components
+
+  	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+  	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+
+  }
+  document.addEventListener("mousemove", mouseMove, false);
+
   function init() {
     initControls();
     initPointerLock();
@@ -73,43 +84,46 @@
   }
 
   function updateRay() {
-    var dir = new THREE.Vector3();
-    controls.getDirection(dir);
+    var vector = mouseMesh.geometry.boundingSphere.center;
+  	projector.unprojectVector( vector, camera );
+  	var ray = new THREE.Raycaster( camera.position, vector.sub( camera.position ).normalize() );
 
-    dir.normalize();
-
-  	//projector.unprojectVector( dir, camera );
-  	//var rayCam = new THREE.Ray( camera.position, dir.sub( camera.position ).normalize() );
-    //var rayCaster = new THREE.Raycaster(rayCam.origin, rayCam.direction);
-
-  	//var intersects = rayCaster.intersectObjects( scene.children );
-
-    var ray = new THREE.Raycaster();
-    ray.set( controls.getObject().position, dir );
-    // raycaster.setFromCamera(dir, camera);
-    var intersects = ray.intersectObjects(scene.children);
-    //
-    console.log(intersects);
-
-  	if ( intersects.length > 0 ) {
-  		if ( intersects[ 0 ].object != INTERSECTED )	{
-  		    // restore previous intersection object (if it exists) to its original color
-  			if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
-  			// store reference to closest object as current intersection object
-  			INTERSECTED = intersects[ 0 ].object;
-  			// store color of closest object (for later restoration)
-  			INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
-  			// set a new color for closest object
-  			INTERSECTED.material.color.setHex( 0xffff00 );
-  		}
-  	}
-  	else {
-  		if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
-  		INTERSECTED = null;
-  	}
+    var intersects = ray.intersectObjects( scene.children );
+    if ( intersects.length > 0 )
+{
+  // if the closest object intersected is not the currently stored intersection object
+  if ( intersects[ 0 ].object != INTERSECTED )
+  {
+      // restore previous intersection object (if it exists) to its original color
+    if ( INTERSECTED )
+      INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
+    // store reference to closest object as current intersection object
+    INTERSECTED = intersects[ 0 ].object;
+    // store color of closest object (for later restoration)
+    INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
+    // set a new color for closest object
+    INTERSECTED.material.color.setHex( 0xffff00 );
+  }
+}
+else // there are no intersections
+{
+  // restore previous intersection object (if it exists) to its original color
+  if ( INTERSECTED )
+    INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
+  // remove previous intersection object reference
+  //     by setting current intersection object to "nothing"
+  INTERSECTED = null;
+}
   }
 
   function animate() {
+    raycaster.setFromCamera( mouse, camera );
+  	// calculate objects intersecting the picking ray
+  	var intersects = raycaster.intersectObjects( scene.children );
+  	for ( var i = 0; i < intersects.length; i++ ) {
+  		intersects[ i ].object.material.color.set( 0xff0000 );
+	   }
+
     requestAnimationFrame(animate);
     updateControls();
     updateRay();
@@ -252,4 +266,10 @@
     }
   }
 
+  $('body').append('<canvas id="radar" width="200" height="200"></canvas>');
+	$('body').append('<div id="hud"><p>Health: <span id="health">100</span><br />Score: <span id="score">0</span></p></div>');
+	$('body').append('<div id="credits"><p>Created by <a href="http://www.isaacsukin.com/">Isaac Sukin</a> using <a href="http://mrdoob.github.com/three.js/">Three.js</a><br />WASD to move, mouse to look, click to shoot</p></div>');
+
+	// Set up the brief red flash that shows when you get hurt
+	$('body').append('<div id="hurt"></div>');
 })();

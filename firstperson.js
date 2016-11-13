@@ -2,7 +2,6 @@
   var clock;
   var scene, camera, renderer;
   var geometry, material, mesh;
-  var havePointerLock = checkForPointerLock();
   var controls, controlsEnabled;
   var moveForward,
       moveBackward,
@@ -11,8 +10,10 @@
       sprint,
       canJump;
 	var mouseMesh;
+  var MOVESPEED = 200;
+  var controls;
   var velocity = new THREE.Vector3();
-  var projector, mouse = { x: 0, y: 0 }, INTERSECTED;
+  var mouse = { x: 0, y: 0 };
 
   init();
   animate();
@@ -20,14 +21,21 @@
 	function addObject(objName) {
 		var cube = null;
 		var loader = new THREE.ObjectLoader();
-		loader.load( objName, function ( o ) {
+		cube = loader.load( objName, function ( o ) {
 			scene.add(o);
 		});
 	}
 
+  function mouseMove( event ) {
+  	mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
+  	mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+  }
+
+  document.addEventListener("mousemove", mouseMove, false);
+
   function init() {
-    initControls();
-    initPointerLock();
+    //initControls();
+
     projector = new THREE.Projector();
 
     clock = new THREE.Clock();
@@ -45,26 +53,21 @@
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
     camera.position.y = 10;
+    scene.add(camera);
 
-		var pointer = null;
+    controls = new THREE.FirstPersonControls(camera);
+  	controls.movementSpeed = 200; // How fast the player can walk around
+  	controls.lookSpeed = 1;
+  	controls.lookVertical = false;
+  	controls.noFly = true;
 
-    // pointer
-    var mouseGeometry = new THREE.SphereGeometry(0.005, 0, 0);
-  	var mouseMaterial = new THREE.MeshBasicMaterial({ color: "rgb(255, 255, 255)" });
-  	mouseMesh = new THREE.Mesh(mouseGeometry, mouseMaterial);
-  	mouseMesh.position.z = -1.05;
-  	camera.add(mouseMesh);
 
     // TODO raycasting
 
-		scene.add(camera);
 
-    controls = new THREE.PointerLockControls(camera);
-    scene.add(controls.getObject());
 
     // floor
     scene.add(createFloor());
-		addObject('skull.json');
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -72,46 +75,13 @@
     document.body.appendChild(renderer.domElement);
   }
 
-  function updateRay() {
-    var dir = new THREE.Vector3();
-    controls.getDirection(dir);
-
-    dir.normalize();
-
-  	//projector.unprojectVector( dir, camera );
-  	//var rayCam = new THREE.Ray( camera.position, dir.sub( camera.position ).normalize() );
-    //var rayCaster = new THREE.Raycaster(rayCam.origin, rayCam.direction);
-
-  	//var intersects = rayCaster.intersectObjects( scene.children );
-
-    var ray = new THREE.Raycaster();
-    ray.set( controls.getObject().position, dir );
-    // raycaster.setFromCamera(dir, camera);
-    var intersects = ray.intersectObjects(scene.children);
-    //
-    console.log(intersects);
-
-  	if ( intersects.length > 0 ) {
-  		if ( intersects[ 0 ].object != INTERSECTED )	{
-  		    // restore previous intersection object (if it exists) to its original color
-  			if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
-  			// store reference to closest object as current intersection object
-  			INTERSECTED = intersects[ 0 ].object;
-  			// store color of closest object (for later restoration)
-  			INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
-  			// set a new color for closest object
-  			INTERSECTED.material.color.setHex( 0xffff00 );
-  		}
-  	}
-  	else {
-  		if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
-  		INTERSECTED = null;
-  	}
-  }
+  function updateRay() {}
 
   function animate() {
     requestAnimationFrame(animate);
-    updateControls();
+    var delta = clock.getDelta();
+	controls.update(delta); // Move camera
+    //updateControls();
     updateRay();
     renderer.render(scene, camera);
   }
@@ -124,47 +94,6 @@
 		texture.repeat.set(16, 16);
 		material = new THREE.MeshBasicMaterial({ color: "rgb(255, 255, 255)", map: texture});
 	  return new THREE.Mesh(geometry, material);
-  }
-
-  function checkForPointerLock() {
-    return 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
-  }
-
-  function initPointerLock() {
-    var element = document.body;
-    if (havePointerLock) {
-      var pointerlockchange = function (event) {
-        if (document.pointerLockElement === element ||
-            document.mozPointerLockElement === element ||
-            document.webkitPointerLockElement === element) {
-          controlsEnabled = true;
-          controls.enabled = true;
-        } else {
-          controls.enabled = false;
-        }
-      };
-
-      var pointerlockerror = function (event) {
-        element.innerHTML = 'PointerLock Error';
-      };
-
-      document.addEventListener('pointerlockchange', pointerlockchange, false);
-      document.addEventListener('mozpointerlockchange', pointerlockchange, false);
-      document.addEventListener('webkitpointerlockchange', pointerlockchange, false);
-
-      document.addEventListener('pointerlockerror', pointerlockerror, false);
-      document.addEventListener('mozpointerlockerror', pointerlockerror, false);
-      document.addEventListener('webkitpointerlockerror', pointerlockerror, false);
-
-      var requestPointerLock = function(event) {
-        element.requestPointerLock = element.requestPointerLock || element.mozRequestPointerLock || element.webkitRequestPointerLock;
-        element.requestPointerLock();
-      };
-
-      element.addEventListener('click', requestPointerLock, false);
-    } else {
-      element.innerHTML = 'Bad browser; No pointer lock';
-    }
   }
 
   function onKeyDown(e) {
@@ -251,5 +180,6 @@
       }
     }
   }
+
 
 })();
