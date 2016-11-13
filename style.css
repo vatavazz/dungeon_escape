@@ -1,3 +1,6 @@
 
 body { margin: 0; overflow: hidden; background: #000;}
 canvas { width: 100%; height: 100% }
+
+#pointer { position: fixed; top: 50%; left: 50%; margin-left: -32px; margin-top: -32px; width: 64px; height: 64px; background: url('crosshairs.png') right top;}
+#health {}

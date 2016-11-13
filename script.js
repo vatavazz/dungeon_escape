@@ -10,9 +10,9 @@
       moveRight,
       sprint,
       canJump;
-	var mouseMesh;
   var velocity = new THREE.Vector3();
-  var projector, mouse = { x: 0, y: 0 }, INTERSECTED;
+  var INTERSECTED;
+  var selObj;
 
   init();
   animate();
@@ -21,6 +21,7 @@
 		var cube = null;
 		var loader = new THREE.ObjectLoader();
 		loader.load( objName, function ( o ) {
+      o.position.z = 15;
 			scene.add(o);
 		});
 	}
@@ -41,21 +42,9 @@
 		backgroundMesh.material.depthTest = false;
 		backgroundMesh.material.depthWrite = false;
 
-    //scene.fog = new THREE.Fog("rgb(178, 225, 242)", 0, 750);
+    scene.fog = new THREE.Fog("rgb(178, 225, 242)", 0, 750);
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
-    camera.position.y = 10;
-
-		var pointer = null;
-
-    // pointer
-    var mouseGeometry = new THREE.SphereGeometry(0.005, 0, 0);
-  	var mouseMaterial = new THREE.MeshBasicMaterial({ color: "rgb(255, 255, 255)" });
-  	mouseMesh = new THREE.Mesh(mouseGeometry, mouseMaterial);
-  	mouseMesh.position.z = -1.05;
-  	camera.add(mouseMesh);
-
-    // TODO raycasting
 
 		scene.add(camera);
 
@@ -66,32 +55,44 @@
     scene.add(createFloor());
 		addObject('skull.json');
 
+    var geometry = new THREE.BoxGeometry( 6, 6, 6 );
+		var material = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load('floor.jpg') } );
+		var cube = new THREE.Mesh( geometry, material );
+    cube.position.z = -50;
+    cube.position.y = 3;
+		scene.add( cube );
+
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor("rgb(178, 225, 242)");
     document.body.appendChild(renderer.domElement);
   }
 
-  function updateRay() {
+  function checkCollision() {
     var dir = new THREE.Vector3();
     controls.getDirection(dir);
-
     dir.normalize();
-
-  	//projector.unprojectVector( dir, camera );
-  	//var rayCam = new THREE.Ray( camera.position, dir.sub( camera.position ).normalize() );
-    //var rayCaster = new THREE.Raycaster(rayCam.origin, rayCam.direction);
-
-  	//var intersects = rayCaster.intersectObjects( scene.children );
 
     var ray = new THREE.Raycaster();
     ray.set( controls.getObject().position, dir );
-    // raycaster.setFromCamera(dir, camera);
-    var intersects = ray.intersectObjects(scene.children);
-    //
-    console.log(intersects);
 
-  	if ( intersects.length > 0 ) {
+    if (ray.intersectObjects(scene.children). length > 0 && ray.intersectObjects(scene.children)[0].object.geometry.type != 'PlaneGeometry') {
+      // collision
+      return true;
+    }
+    return false;
+  }
+
+  function updateRay() {
+    var dir = new THREE.Vector3();
+    controls.getDirection(dir);
+    dir.normalize();
+
+    var ray = new THREE.Raycaster();
+    ray.set( controls.getObject().position, dir );
+    var intersects = ray.intersectObjects(scene.children);
+
+  	if ( intersects.length >  0 && intersects[0].object.geometry.type != 'PlaneGeometry' ) {
   		if ( intersects[ 0 ].object != INTERSECTED )	{
   		    // restore previous intersection object (if it exists) to its original color
   			if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
@@ -100,7 +101,7 @@
   			// store color of closest object (for later restoration)
   			INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
   			// set a new color for closest object
-  			INTERSECTED.material.color.setHex( 0xffff00 );
+  			INTERSECTED.material.color.setHex( 0x6bdae9 );
   		}
   	}
   	else {
@@ -186,12 +187,17 @@
         moveRight = true;
         break;
       case 32: // space
-        if (canJump === true) velocity.y += 250;
+        if (canJump === true) velocity.y += 200;
         canJump = false;
         break;
       case 16: // shift
         sprint=true;
         break;
+        case 69: // e
+          if (INTERSECTED !== null) {
+            INTERSECTED.onCursor = true;
+          }
+          break;
     }
   }
   function onKeyUp(e) {
@@ -214,6 +220,11 @@
         break;
       case 16: // shift
         sprint = false;
+        break;
+      case 69: // e
+        if (INTERSECTED !== null) {
+          INTERSECTED.onCursor = false;
+        }
         break;
     }
   }
@@ -240,6 +251,10 @@
       if (moveLeft) velocity.x -= walkingSpeed * delta;
       if (moveRight) velocity.x += walkingSpeed * delta;
 
+      if (checkCollision) {
+        // collision checking
+      }
+
       controls.getObject().translateX(velocity.x * delta);
       controls.getObject().translateY(velocity.y * delta);
       controls.getObject().translateZ(velocity.z * delta);
@@ -248,6 +263,13 @@
         velocity.y = 0;
         controls.getObject().position.y = 10;
         canJump = true;
+      }
+
+      if (INTERSECTED !== null && INTERSECTED.onCursor) {
+        // var dir = new THREE.Vector3();
+        // dir = controls.getObject().position;
+        // INTERSECTED.position.x = dir.x;
+        // INTERSECTED.position.y = dir.y;
       }
     }
   }

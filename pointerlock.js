@@ -55,7 +55,7 @@
     //scene.fog = new THREE.Fog("rgb(178, 225, 242)", 0, 750);
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
-    camera.position.y = 10;
+    //camera.position.y = 10;
 
 		var pointer = null;
 
