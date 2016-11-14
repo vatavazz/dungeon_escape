@@ -12,7 +12,7 @@
       canJump;
   var velocity = new THREE.Vector3();
   var INTERSECTED;
-  var selObj;
+  var selObj = null;
 
   init();
   animate();
@@ -42,7 +42,7 @@
 		backgroundMesh.material.depthTest = false;
 		backgroundMesh.material.depthWrite = false;
 
-    scene.fog = new THREE.Fog("rgb(178, 225, 242)", 0, 750);
+    scene.fog = new THREE.Fog("rgb(20, 20, 34)", 0, 750);
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
 
@@ -64,7 +64,7 @@
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setClearColor("rgb(178, 225, 242)");
+    renderer.setClearColor("rgb(20, 20, 34)");
     document.body.appendChild(renderer.domElement);
   }
 
@@ -195,7 +195,8 @@
         break;
         case 69: // e
           if (INTERSECTED !== null) {
-            INTERSECTED.onCursor = true;
+            selObj = INTERSECTED;
+            selObj.pickedUp = true;
           }
           break;
     }
@@ -223,10 +224,25 @@
         break;
       case 69: // e
         if (INTERSECTED !== null) {
-          INTERSECTED.onCursor = false;
+          selObj.pickedUp = false;
         }
         break;
     }
+  }
+
+  function pickUpObject (o) {
+    selObj = o;
+
+    var pos = new THREE.Vector3();
+    pos = controls.getObject().position;
+    var dir = new THREE.Vector3();
+    controls.getDirection(dir);
+
+    selObj.material.color.setHex( 0xe4326d );
+    selObj.position.x = dir.x+pos.x;
+    selObj.position.y = dir.y+pos.y;
+    if (dir.z > 0) selObj.position.z = dir.z+pos.z+10;
+    if (dir.z < 0) selObj.position.z = dir.z+pos.z-10;
   }
 
   function initControls() {
@@ -265,11 +281,24 @@
         canJump = true;
       }
 
-      if (INTERSECTED !== null && INTERSECTED.onCursor) {
-        // var dir = new THREE.Vector3();
-        // dir = controls.getObject().position;
-        // INTERSECTED.position.x = dir.x;
-        // INTERSECTED.position.y = dir.y;
+      // FIXME interaction
+      if (selObj !== null && selObj.pickedUp) {
+        var pos = new THREE.Vector3();
+        pos = controls.getObject().position;
+        var dir = new THREE.Vector3();
+        controls.getDirection(dir);
+
+  			selObj.material.color.setHex( 0xe4326d );
+        selObj.position.x = dir.x+pos.x;
+        selObj.position.y = dir.y+pos.y;
+        if (dir.z == 0) selObj.position.z = 0;
+        if (dir.z > 0) selObj.position.z = dir.z+pos.z+10;
+        if (dir.z < 0) selObj.position.z = dir.z+pos.z-10;
+      }
+      if (selObj !== null && !selObj.pickedUp) {
+        selObj.material.color.setHex( selObj.currentHex );
+        selObj.position.y = 3;
+        selObj = null;
       }
     }
   }
