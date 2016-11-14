@@ -1,7 +1,6 @@
 TODO LIST
 
 * object interaction
-* fix jumping
 * colision checking
 
 * separate stuff into diff files

@@ -14,7 +14,6 @@
   var INTERSECTED;
   var selObj = null;
   var vPrev = new THREE.Vector3();
-  var heldObj;
 
   init();
   animate();
@@ -53,9 +52,33 @@
     scene.add(controls.getObject());
 
     // floor
-    var skull;
     scene.add(createFloor());
-		addObject('skull.json');
+
+		//addObject('skull.json');
+
+    var loader = new THREE.ObjectLoader();
+    var jLoader = new THREE.JSONLoader();
+    var jObj;
+    $.ajax({
+      url: 'skull.json',
+      async: false,
+      dataType: 'json',
+      success: function (response) {
+        jObj = response;
+      }
+    });
+
+    var skull = loader.parse(jObj);
+    skull.position.z = 50;
+    scene.add(skull);
+    //console.log(skull.uuid);
+    //
+		// loader.load( 'skull.json', function ( o ) {
+    //   skull = o;
+    //   skull.position.z = 15;
+    //
+    //   console.log(scene.children);
+		// });
 
     var geometry = new THREE.BoxGeometry( 6, 6, 6 );
 		var material = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load('floor.jpg') } );
@@ -63,6 +86,10 @@
     cube.position.z = -50;
     cube.position.y = 3;
 		scene.add( cube );
+
+    for (var i in scene.children) {
+      //console.log(scene.children[i]);
+    }
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -72,17 +99,6 @@
 
   // TODO
   function checkCollision() {
-    var dir = new THREE.Vector3();
-    controls.getDirection(dir);
-    dir.normalize();
-
-    var ray = new THREE.Raycaster();
-    ray.set( controls.getObject().position, dir );
-
-    if (ray.intersectObjects(scene.children). length > 0 && ray.intersectObjects(scene.children)[0].object.geometry.type != 'PlaneGeometry') {
-      // collision
-      return true;
-    }
     return false;
   }
 
@@ -93,15 +109,15 @@
 
     var ray = new THREE.Raycaster();
     ray.set( controls.getObject().position, dir );
-    var intersects = ray.intersectObjects(scene.children);
+    var intersects = ray.intersectObjects(scene.children, true );
+    if (intersects.length > 1) console.log(scene.children);
 
   	if ( intersects.length >  0 && intersects[0].object.geometry.type != 'PlaneGeometry' ) {
   		if ( intersects[ 0 ].object != INTERSECTED )	{
-
-  			if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
+  			// if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
   			INTERSECTED = intersects[ 0 ].object;
   			INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
-        if ( INTERSECTED && !selObj ) INTERSECTED.originalHex = INTERSECTED.currentHex;
+        //if ( INTERSECTED && !selObj ) INTERSECTED.originalHex = INTERSECTED.currentHex;
   			INTERSECTED.material.color.setHex( 0x6bdae9 );
   		}
   	}
@@ -113,7 +129,7 @@
 
   function animate() {
     requestAnimationFrame(animate);
-    if (vPrev === null) controls.getDirection(vPrev);
+    if (!vPrev) controls.getDirection(vPrev);
     updateControls();
     updateRay();
     renderer.render(scene, camera);
@@ -256,6 +272,7 @@
   function updateControls() {
     if (controlsEnabled) {
       var delta = clock.getDelta();
+      //console.log(delta);
       var walkingSpeed = 200.0;
       if (sprint) walkingSpeed = 600;
 
@@ -285,29 +302,25 @@
       }
 
       // FIXME interaction
-      if (selObj !== null && selObj.pickedUp) {
+      if (selObj && selObj.pickedUp) {
+          //camera.add(selObj);
         var pos = new THREE.Vector3();
         pos = controls.getObject().position;
         var dir = new THREE.Vector3();
         controls.getDirection(dir);
-
         var vCurr = new THREE.Vector3();
         controls.getDirection(vCurr);
         var quat = new THREE.Quaternion();
         quat.setFromUnitVectors(vPrev, vCurr);
         controls.getDirection(vPrev);
 
-        dir.multiplyScalar(15);
-        selObj.position = selObj.position.addVectors(dir,pos).applyQuaternion(quat);
-        // TODO rotate cube along with camera
-        //var brr = selObj.quaternion.multiplyQuaternions(quat, selObj.quaternion).normalize();
-        //selObj.setRotationFromQuaternion(brr);
-        //console.log(selObj.quaternion);
-      }
+        selObj.position = selObj.position.addVectors(dir.multiplyScalar(5),pos).applyQuaternion(quat);
 
+        // TODO rotate cube along with camera
+      }
       if (selObj && !selObj.pickedUp) {
         selObj.material.color.setHex( INTERSECTED.originalHex );
-        selObj.position.y = 3;
+        selObj.position.y = 0;
         selObj = null;
       }
     }
