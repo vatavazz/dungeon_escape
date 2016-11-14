@@ -13,16 +13,17 @@
   var velocity = new THREE.Vector3();
   var INTERSECTED;
   var selObj = null;
+  var vPrev = new THREE.Vector3();
+  var heldObj;
 
   init();
   animate();
 
 	function addObject(objName) {
-		var cube = null;
 		var loader = new THREE.ObjectLoader();
 		loader.load( objName, function ( o ) {
       o.position.z = 15;
-			scene.add(o);
+      scene.add(o);
 		});
 	}
 
@@ -52,6 +53,7 @@
     scene.add(controls.getObject());
 
     // floor
+    var skull;
     scene.add(createFloor());
 		addObject('skull.json');
 
@@ -68,6 +70,7 @@
     document.body.appendChild(renderer.domElement);
   }
 
+  // TODO
   function checkCollision() {
     var dir = new THREE.Vector3();
     controls.getDirection(dir);
@@ -94,13 +97,11 @@
 
   	if ( intersects.length >  0 && intersects[0].object.geometry.type != 'PlaneGeometry' ) {
   		if ( intersects[ 0 ].object != INTERSECTED )	{
-  		    // restore previous intersection object (if it exists) to its original color
+
   			if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
-  			// store reference to closest object as current intersection object
   			INTERSECTED = intersects[ 0 ].object;
-  			// store color of closest object (for later restoration)
   			INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
-  			// set a new color for closest object
+        if ( INTERSECTED && !selObj ) INTERSECTED.originalHex = INTERSECTED.currentHex;
   			INTERSECTED.material.color.setHex( 0x6bdae9 );
   		}
   	}
@@ -112,6 +113,7 @@
 
   function animate() {
     requestAnimationFrame(animate);
+    if (vPrev === null) controls.getDirection(vPrev);
     updateControls();
     updateRay();
     renderer.render(scene, camera);
@@ -187,7 +189,7 @@
         moveRight = true;
         break;
       case 32: // space
-        if (canJump === true) velocity.y += 200;
+        if (canJump === true) velocity.y += 100;
         canJump = false;
         break;
       case 16: // shift
@@ -255,11 +257,11 @@
     if (controlsEnabled) {
       var delta = clock.getDelta();
       var walkingSpeed = 200.0;
-      if (sprint) walkingSpeed += 400;
+      if (sprint) walkingSpeed = 600;
 
       velocity.x -= velocity.x * 10.0 * delta;
       velocity.z -= velocity.z * 10.0 * delta;
-      velocity.y -= 9.8 * 100.0 * delta;
+      velocity.y -= 9.8 * 25.0 * delta;
 
       if (moveForward) velocity.z -= walkingSpeed * delta;
       if (moveBackward) velocity.z += walkingSpeed * delta;
@@ -267,6 +269,7 @@
       if (moveLeft) velocity.x -= walkingSpeed * delta;
       if (moveRight) velocity.x += walkingSpeed * delta;
 
+      // TODO
       if (checkCollision) {
         // collision checking
       }
@@ -288,15 +291,22 @@
         var dir = new THREE.Vector3();
         controls.getDirection(dir);
 
-  			selObj.material.color.setHex( 0xe4326d );
-        selObj.position.x = dir.x+pos.x;
-        selObj.position.y = dir.y+pos.y;
-        if (dir.z == 0) selObj.position.z = 0;
-        if (dir.z > 0) selObj.position.z = dir.z+pos.z+10;
-        if (dir.z < 0) selObj.position.z = dir.z+pos.z-10;
+        var vCurr = new THREE.Vector3();
+        controls.getDirection(vCurr);
+        var quat = new THREE.Quaternion();
+        quat.setFromUnitVectors(vPrev, vCurr);
+        controls.getDirection(vPrev);
+
+        dir.multiplyScalar(15);
+        selObj.position = selObj.position.addVectors(dir,pos).applyQuaternion(quat);
+        // TODO rotate cube along with camera
+        //var brr = selObj.quaternion.multiplyQuaternions(quat, selObj.quaternion).normalize();
+        //selObj.setRotationFromQuaternion(brr);
+        //console.log(selObj.quaternion);
       }
-      if (selObj !== null && !selObj.pickedUp) {
-        selObj.material.color.setHex( selObj.currentHex );
+
+      if (selObj && !selObj.pickedUp) {
+        selObj.material.color.setHex( INTERSECTED.originalHex );
         selObj.position.y = 3;
         selObj = null;
       }
