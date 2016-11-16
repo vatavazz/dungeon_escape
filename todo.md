@@ -1,7 +1,7 @@
 TODO LIST
 
 * object interaction
-* colision checking
+* colision checking == rafa
 
 * separate stuff into diff files
 
@@ -9,4 +9,4 @@ TODO LIST
 * npc objects == enemies
 
 * simple AI
-* room design engine
+* room design engine == rafa
