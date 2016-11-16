@@ -3,6 +3,7 @@
  */
 
 THREE.PointerLockControls = function ( camera ) {
+
 	var scope = this;
 
 	camera.rotation.set( 0, 0, 0 );
@@ -11,7 +12,7 @@ THREE.PointerLockControls = function ( camera ) {
 	pitchObject.add( camera );
 
 	var yawObject = new THREE.Object3D();
-	yawObject.position.y = 2;
+	yawObject.position.y = 10;
 	yawObject.add( pitchObject );
 
 	var PI_2 = Math.PI / 2;
@@ -30,91 +31,39 @@ THREE.PointerLockControls = function ( camera ) {
 
 	};
 
-  function onKeyDown(e) {
-    switch (e.keyCode) {
-      case 38: // up
-      case 87: // w
-        moveForward = true;
-        break;
-      case 37: // left
-      case 65: // a
-        moveLeft = true;
-        break;
-      case 40: // down
-      case 83: // s
-        moveBackward = true;
-        break;
-      case 39: // right
-      case 68: // d
-        moveRight = true;
-        break;
-      case 32: // space
-        if (canJump === true) velocity.y += 100;
-        canJump = false;
-        break;
-      case 16: // shift
-        sprint=true;
-        break;
-        case 69: // e
-          if (!INTERSECTED) {
-            // selObj = INTERSECTED;
-            // selObj.pickedUp = true;
-          }
-          break;
-    }
-  }
-  function onKeyUp(e) {
-    switch(e.keyCode) {
-      case 38: // up
-      case 87: // w
-        moveForward = false;
-        break;
-      case 37: // left
-      case 65: // a
-        moveLeft = false;
-        break;
-      case 40: // down
-      case 83: // s
-        moveBackward = false;
-        break;
-      case 39: // right
-      case 68: // d
-        moveRight = false;
-        break;
-      case 16: // shift
-        sprint = false;
-        break;
-      case 69: // e
-        if (INTERSECTED !== null) {
-          selObj.pickedUp = false;
-        }
-        break;
-    }
-  }
-
 	this.dispose = function() {
+
 		document.removeEventListener( 'mousemove', onMouseMove, false );
-		document.removeEventListener('keydown', onKeyDown, false);
-    document.removeEventListener('keyup', onKeyUp, false);
+
 	};
 
-	document.addEventListener('mousemove', onMouseMove, false);
-	// document.addEventListener('keydown', onKeyDown, false);
-	// document.addEventListener('keyup', onKeyUp, false);
+	document.addEventListener( 'mousemove', onMouseMove, false );
 
 	this.enabled = false;
 
-	this.getObject = function () { return yawObject; };
+	this.getObject = function () {
+
+		return yawObject;
+
+	};
 
 	this.getDirection = function() {
+
+		// assumes the camera itself is not rotated
+
 		var direction = new THREE.Vector3( 0, 0, - 1 );
 		var rotation = new THREE.Euler( 0, 0, 0, "YXZ" );
 
 		return function( v ) {
+
 			rotation.set( pitchObject.rotation.x, yawObject.rotation.y, 0 );
+
 			v.copy( direction ).applyEuler( rotation );
+
 			return v;
+
 		};
+
 	}();
 
 };
