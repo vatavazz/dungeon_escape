@@ -71,14 +71,10 @@
     var skull = loader.parse(jObj);
     skull.position.z = 50;
     scene.add(skull);
-    //console.log(skull.uuid);
-    //
-		// loader.load( 'skull.json', function ( o ) {
-    //   skull = o;
-    //   skull.position.z = 15;
-    //
-    //   console.log(scene.children);
-		// });
+
+    var sphere =  new THREE.Mesh( new THREE.SphereGeometry(3,16,16),
+                  new THREE.MeshLambertMaterial( {color: "rgb(221, 28, 28)" } ));
+    scene.add(sphere);
 
     var geometry = new THREE.BoxGeometry( 6, 6, 6 );
 		var material = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load('floor.jpg') } );
@@ -266,13 +262,13 @@
   function initControls() {
     document.addEventListener('keydown', onKeyDown, false);
     document.addEventListener('keyup', onKeyUp, false);
-    raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 10);
+    //raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 10);
   }
 
   function updateControls() {
     if (controlsEnabled) {
       var delta = clock.getDelta();
-      //console.log(delta);
+
       var walkingSpeed = 200.0;
       if (sprint) walkingSpeed = 600;
 
@@ -303,7 +299,6 @@
 
       // FIXME interaction
       if (selObj && selObj.pickedUp) {
-          //camera.add(selObj);
         var pos = new THREE.Vector3();
         pos = controls.getObject().position;
         var dir = new THREE.Vector3();
@@ -314,13 +309,13 @@
         quat.setFromUnitVectors(vPrev, vCurr);
         controls.getDirection(vPrev);
 
-        selObj.position = selObj.position.addVectors(dir.multiplyScalar(5),pos).applyQuaternion(quat);
+        selObj.position = selObj.position.addVectors(dir.multiplyScalar(15),pos).applyQuaternion(quat);
 
         // TODO rotate cube along with camera
       }
       if (selObj && !selObj.pickedUp) {
         selObj.material.color.setHex( INTERSECTED.originalHex );
-        selObj.position.y = 0;
+        selObj.position.y = 3;
         selObj = null;
       }
     }
