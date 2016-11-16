@@ -18,14 +18,6 @@
   init();
   animate();
 
-	function addObject(objName) {
-		var loader = new THREE.ObjectLoader();
-		loader.load( objName, function ( o ) {
-      o.position.z = 15;
-      scene.add(o);
-		});
-	}
-
   function init() {
     initControls();
     initPointerLock();
@@ -34,8 +26,8 @@
     clock = new THREE.Clock();
     scene = new THREE.Scene();
 
-		var loader = new THREE.TextureLoader();
-		var texture = loader.load( 'wall.jpg' );
+		var tLoader = new THREE.TextureLoader();
+		var texture = tLoader.load( 'wall.jpg' );
 		var backgroundMesh = new THREE.Mesh(  new THREE.PlaneGeometry(2048, 2048),
                                           new THREE.MeshBasicMaterial({map: texture}));
 
@@ -71,21 +63,17 @@
     var skull = loader.parse(jObj);
     skull.position.z = 50;
     scene.add(skull);
-    //console.log(skull.uuid);
-    //
-		// loader.load( 'skull.json', function ( o ) {
-    //   skull = o;
-    //   skull.position.z = 15;
-    //
-    //   console.log(scene.children);
-		// });
 
     var geometry = new THREE.BoxGeometry( 6, 6, 6 );
-		var material = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load('floor.jpg') } );
+		var material = new THREE.MeshLambertMaterial( { map: new THREE.TextureLoader().load('floor.jpg') } );
 		var cube = new THREE.Mesh( geometry, material );
     cube.position.z = -50;
     cube.position.y = 3;
 		scene.add( cube );
+
+    var sphere =  new THREE.Mesh( new THREE.SphereGeometry(3,16,16),
+                  new THREE.MeshLambertMaterial( {color: "rgb(221, 28, 28)" } ));
+    scene.add(sphere);
 
     for (var i in scene.children) {
       //console.log(scene.children[i]);
@@ -110,7 +98,7 @@
     var ray = new THREE.Raycaster();
     ray.set( controls.getObject().position, dir );
     var intersects = ray.intersectObjects(scene.children, true );
-    if (intersects.length > 1) console.log(scene.children);
+    if (intersects.length > 1) //console.log(scene.children);
 
   	if ( intersects.length >  0 && intersects[0].object.geometry.type != 'PlaneGeometry' ) {
   		if ( intersects[ 0 ].object != INTERSECTED )	{
@@ -158,14 +146,10 @@
             document.webkitPointerLockElement === element) {
           controlsEnabled = true;
           controls.enabled = true;
-        } else {
-          controls.enabled = false;
-        }
+        } else { controls.enabled = false; }
       };
 
-      var pointerlockerror = function (event) {
-        element.innerHTML = 'PointerLock Error';
-      };
+      var pointerlockerror = function (event) { element.innerHTML = 'PointerLock Error'; };
 
       document.addEventListener('pointerlockchange', pointerlockchange, false);
       document.addEventListener('mozpointerlockchange', pointerlockchange, false);
@@ -185,6 +169,12 @@
       element.innerHTML = 'Bad browser; No pointer lock';
     }
   }
+
+  function clicked(e) {
+    //alert("hello");
+  }
+
+  window.addEventListener("click",clicked);
 
   function onKeyDown(e) {
     switch (e.keyCode) {
@@ -272,7 +262,6 @@
   function updateControls() {
     if (controlsEnabled) {
       var delta = clock.getDelta();
-      //console.log(delta);
       var walkingSpeed = 200.0;
       if (sprint) walkingSpeed = 600;
 
@@ -314,13 +303,13 @@
         quat.setFromUnitVectors(vPrev, vCurr);
         controls.getDirection(vPrev);
 
-        selObj.position = selObj.position.addVectors(dir.multiplyScalar(5),pos).applyQuaternion(quat);
+        selObj.position = selObj.position.addVectors(dir.multiplyScalar(15),pos).applyQuaternion(quat);
 
         // TODO rotate cube along with camera
       }
       if (selObj && !selObj.pickedUp) {
         selObj.material.color.setHex( INTERSECTED.originalHex );
-        selObj.position.y = 0;
+        selObj.position.y = 3;
         selObj = null;
       }
     }
