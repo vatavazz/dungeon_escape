@@ -13,18 +13,44 @@
   var velocity = new THREE.Vector3();
   var INTERSECTED;
   var selObj = null;
+  var selected = false;
   var vPrev = new THREE.Vector3();
 
-  init();
-  animate();
+  var pewpew = new Audio('pew.mp3');
+  pewpew.preload = true;
 
-	function addObject(objName) {
-		var loader = new THREE.ObjectLoader();
-		loader.load( objName, function ( o ) {
-      o.position.z = 15;
-      scene.add(o);
-		});
-	}
+  var projectileMaterial = new THREE.MeshBasicMaterial({color: "rgb(0, 215, 67)"});
+  var projectileGeo = new THREE.SphereGeometry(0.5,8,8);
+  var projectiles = [];
+
+  var evilGeo = new THREE.BoxGeometry( 6, 6, 6 );
+  var evilMat = new THREE.MeshBasicMaterial( { color:"rgb(99, 58, 124)" } );
+  var enemies = [];
+
+  function shootProj(o) {
+    var projectile = new THREE.Mesh(projectileGeo, projectileMaterial);
+    projectile.position.set(o.position.x, o.position.y, o.position.z);
+    projectile.direction = new THREE.Vector3();
+    projectile.dist = 0;
+    controls.getDirection(projectile.direction);
+    scene.add(projectile);
+    pewpew.play();
+    projectiles.push(projectile);
+    return projectile;
+  }
+
+  function moveProj() {
+    for (var i in projectiles) {
+      if (projectiles[i].dist < 50) {
+        projectiles[i].position.addVectors(projectiles[i].position, projectiles[i].direction);
+        projectiles[i].dist += 1;
+      } else scene.remove(projectiles[i]);
+    }
+  }
+
+  init();
+  spawnEnemy(0,-50);
+  animate();
 
   function init() {
     initControls();
@@ -54,48 +80,38 @@
     // floor
     scene.add(createFloor());
 
-		//addObject('skull.json');
+    // var loader = new THREE.ObjectLoader();
+    // var jLoader = new THREE.JSONLoader();
+    // var jObj;
+    // $.ajax({
+    //   url: 'skull.json',
+    //   async: false,
+    //   dataType: 'json',
+    //   success: function (response) {
+    //     jObj = response;
+    //   }
+    // });
 
-    var loader = new THREE.ObjectLoader();
-    var jLoader = new THREE.JSONLoader();
-    var jObj;
-    $.ajax({
-      url: 'skull.json',
-      async: false,
-      dataType: 'json',
-      success: function (response) {
-        jObj = response;
-      }
-    });
+    // var skull = loader.parse(jObj);
+    // skull.position.z = 50;
+    // scene.add(skull);
 
-    var skull = loader.parse(jObj);
-    skull.position.z = 50;
-    scene.add(skull);
-
-    var sphere =  new THREE.Mesh( new THREE.SphereGeometry(3,16,16),
-                  new THREE.MeshLambertMaterial( {color: "rgb(221, 28, 28)" } ));
-    scene.add(sphere);
-
-    var geometry = new THREE.BoxGeometry( 6, 6, 6 );
-		var material = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load('floor.jpg') } );
-		var cube = new THREE.Mesh( geometry, material );
-    cube.position.z = -50;
-    cube.position.y = 3;
-		scene.add( cube );
-
-    for (var i in scene.children) {
-      //console.log(scene.children[i]);
-    }
+    // var sphere =  new THREE.Mesh( new THREE.SphereGeometry(3,16,16),
+    //               new THREE.MeshLambertMaterial( {color: "rgb(221, 28, 28)" } ));
+    // sphere.position.y = 3;
+    // scene.add(sphere);
+    //
+    // var geometry = new THREE.BoxGeometry( 6, 6, 6 );
+		// var material = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load('floor.jpg') } );
+		// var cube = new THREE.Mesh( geometry, material );
+    // cube.position.z = -50;
+    // cube.position.y = 3;
+		// scene.add( cube );
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor("rgb(20, 20, 34)");
     document.body.appendChild(renderer.domElement);
-  }
-
-  // TODO
-  function checkCollision() {
-    return false;
   }
 
   function updateRay() {
@@ -106,18 +122,14 @@
     var ray = new THREE.Raycaster();
     ray.set( controls.getObject().position, dir );
     var intersects = ray.intersectObjects(scene.children, true );
-    if (intersects.length > 1) console.log(scene.children);
 
   	if ( intersects.length >  0 && intersects[0].object.geometry.type != 'PlaneGeometry' ) {
   		if ( intersects[ 0 ].object != INTERSECTED )	{
-  			// if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
   			INTERSECTED = intersects[ 0 ].object;
   			INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
-        //if ( INTERSECTED && !selObj ) INTERSECTED.originalHex = INTERSECTED.currentHex;
   			INTERSECTED.material.color.setHex( 0x6bdae9 );
   		}
-  	}
-  	else {
+    } else {
   		if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
   		INTERSECTED = null;
   	}
@@ -128,7 +140,31 @@
     if (!vPrev) controls.getDirection(vPrev);
     updateControls();
     updateRay();
+    moveEnemy();
+    moveProj();
     renderer.render(scene, camera);
+  }
+
+  function spawnEnemy(x, z) {
+    var enemy = new THREE.Mesh( evilGeo, evilMat );
+    enemy.direction = -1;
+    enemy.dist = 0;
+    enemy.position.y = 3;
+    enemy.position.z = z;
+    enemy.position.x = x;
+    scene.add(enemy);
+    enemies.push(enemy);
+    return enemy;
+  }
+
+  function moveEnemy() {
+    for (var i in enemies) {
+      if (enemies[i].dist == 50 || enemies[i].dist === 0) {
+        enemies[i].direction *= -1;
+      }
+      enemies[i].position.z += enemies[i].direction*0.5;
+      enemies[i].dist += enemies[i].direction*0.5;
+    }
   }
 
   function createFloor() {
@@ -201,18 +237,21 @@
         moveRight = true;
         break;
       case 32: // space
-        if (canJump === true) velocity.y += 100;
+        if (canJump) velocity.y += 100;
         canJump = false;
         break;
       case 16: // shift
         sprint=true;
         break;
-        case 69: // e
-          if (INTERSECTED !== null) {
-            selObj = INTERSECTED;
-            selObj.pickedUp = true;
-          }
-          break;
+      case 69: // e
+        if (INTERSECTED !== null) {
+          selObj = INTERSECTED;
+          selObj.pickedUp = true;
+        }
+        break;
+      case 81: //q
+        shootProj(controls.getObject());
+        break;
     }
   }
   function onKeyUp(e) {
@@ -237,55 +276,33 @@
         sprint = false;
         break;
       case 69: // e
-        if (INTERSECTED !== null) {
-          selObj.pickedUp = false;
-        }
+        if (INTERSECTED !== null) selObj.pickedUp = false;
         break;
     }
-  }
-
-  function pickUpObject (o) {
-    selObj = o;
-
-    var pos = new THREE.Vector3();
-    pos = controls.getObject().position;
-    var dir = new THREE.Vector3();
-    controls.getDirection(dir);
-
-    selObj.material.color.setHex( 0xe4326d );
-    selObj.position.x = dir.x+pos.x;
-    selObj.position.y = dir.y+pos.y;
-    if (dir.z > 0) selObj.position.z = dir.z+pos.z+10;
-    if (dir.z < 0) selObj.position.z = dir.z+pos.z-10;
   }
 
   function initControls() {
     document.addEventListener('keydown', onKeyDown, false);
     document.addEventListener('keyup', onKeyUp, false);
-    //raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 10);
+    // raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 2);
   }
 
   function updateControls() {
     if (controlsEnabled) {
       var delta = clock.getDelta();
-
-      var walkingSpeed = 200.0;
-      if (sprint) walkingSpeed = 600;
+      var walkSpd = 200.0;
+      if (sprint) walkSpd = 600;
 
       velocity.x -= velocity.x * 10.0 * delta;
       velocity.z -= velocity.z * 10.0 * delta;
       velocity.y -= 9.8 * 25.0 * delta;
 
-      if (moveForward) velocity.z -= walkingSpeed * delta;
-      if (moveBackward) velocity.z += walkingSpeed * delta;
+      if (moveForward) velocity.z -= walkSpd * delta;
+      if (moveBackward) velocity.z += walkSpd * delta;
+      if (moveLeft) velocity.x -= walkSpd * delta;
+      if (moveRight) velocity.x += walkSpd * delta;
 
-      if (moveLeft) velocity.x -= walkingSpeed * delta;
-      if (moveRight) velocity.x += walkingSpeed * delta;
-
-      // TODO
-      if (checkCollision) {
-        // collision checking
-      }
+      // TODO check collision
 
       controls.getObject().translateX(velocity.x * delta);
       controls.getObject().translateY(velocity.y * delta);
@@ -314,7 +331,6 @@
         // TODO rotate cube along with camera
       }
       if (selObj && !selObj.pickedUp) {
-        selObj.material.color.setHex( INTERSECTED.originalHex );
         selObj.position.y = 3;
         selObj = null;
       }

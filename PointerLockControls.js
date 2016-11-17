@@ -1,11 +1,10 @@
 /**
  * @author mrdoob / http://mrdoob.com/
+ * edited by vatavazz
  */
 
 THREE.PointerLockControls = function ( camera ) {
-
 	var scope = this;
-
 	camera.rotation.set( 0, 0, 0 );
 
 	var pitchObject = new THREE.Object3D();
@@ -32,20 +31,13 @@ THREE.PointerLockControls = function ( camera ) {
 	};
 
 	this.dispose = function() {
-
 		document.removeEventListener( 'mousemove', onMouseMove, false );
-
 	};
 
 	document.addEventListener( 'mousemove', onMouseMove, false );
-
 	this.enabled = false;
 
-	this.getObject = function () {
-
-		return yawObject;
-
-	};
+	this.getObject = function () { return yawObject; };
 
 	this.getDirection = function() {
 
@@ -55,15 +47,10 @@ THREE.PointerLockControls = function ( camera ) {
 		var rotation = new THREE.Euler( 0, 0, 0, "YXZ" );
 
 		return function( v ) {
-
 			rotation.set( pitchObject.rotation.x, yawObject.rotation.y, 0 );
-
 			v.copy( direction ).applyEuler( rotation );
-
 			return v;
-
 		};
-
 	}();
 
 };
