@@ -2,7 +2,7 @@
   var clock;
   var scene, camera, renderer;
   var geometry, material, mesh;
-  var havePointerLock = checkForPointerLock();
+  var pLockEnabled = checkPointerLock();
   var controls, controlsEnabled;
   var moveForward,
       moveBackward,
@@ -11,51 +11,13 @@
       sprint,
       canJump;
   var velocity = new THREE.Vector3();
-  var INTERSECTED;
-  var selObj = null;
-  var selected = false;
-  var vPrev = new THREE.Vector3();
-
-  var pewpew = new Audio('pew.mp3');
-  pewpew.preload = true;
-
-  var projectileMaterial = new THREE.MeshBasicMaterial({color: "rgb(0, 215, 67)"});
-  var projectileGeo = new THREE.SphereGeometry(0.5,8,8);
-  var projectiles = [];
-
-  var evilGeo = new THREE.BoxGeometry( 6, 6, 6 );
-  var evilMat = new THREE.MeshBasicMaterial( { color:"rgb(99, 58, 124)" } );
-  var enemies = [];
-
-  function shootProj(o) {
-    var projectile = new THREE.Mesh(projectileGeo, projectileMaterial);
-    projectile.position.set(o.position.x, o.position.y, o.position.z);
-    projectile.direction = new THREE.Vector3();
-    projectile.dist = 0;
-    controls.getDirection(projectile.direction);
-    scene.add(projectile);
-    pewpew.play();
-    projectiles.push(projectile);
-    return projectile;
-  }
-
-  function moveProj() {
-    for (var i in projectiles) {
-      if (projectiles[i].dist < 50) {
-        projectiles[i].position.addVectors(projectiles[i].position, projectiles[i].direction);
-        projectiles[i].dist += 1;
-      } else scene.remove(projectiles[i]);
-    }
-  }
 
   init();
-  spawnEnemy(0,-50);
   animate();
 
   function init() {
     initControls();
     initPointerLock();
-    toggleFullScreen(document.body);
 
     projector = new THREE.Projector();
 
@@ -63,12 +25,6 @@
     scene = new THREE.Scene();
 
 		var loader = new THREE.TextureLoader();
-		var texture = loader.load( 'wall.jpg' );
-		var backgroundMesh = new THREE.Mesh(  new THREE.PlaneGeometry(2048, 2048),
-                                          new THREE.MeshBasicMaterial({map: texture}));
-
-		backgroundMesh.material.depthTest = false;
-		backgroundMesh.material.depthWrite = false;
 
     scene.fog = new THREE.Fog("rgb(20, 20, 34)", 0, 750);
 
@@ -79,8 +35,10 @@
     controls = new THREE.PointerLockControls(camera);
     scene.add(controls.getObject());
 
+    createRoom();
+
     // floor
-    scene.add(createFloor());
+    //scene.add(createFloor());
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -88,98 +46,78 @@
     document.body.appendChild(renderer.domElement);
   }
 
-  function updateRay() {
-    var dir = new THREE.Vector3();
-    controls.getDirection(dir);
-    dir.normalize();
-
-    var ray = new THREE.Raycaster();
-    ray.set( controls.getObject().position, dir );
-    var intersects = ray.intersectObjects(scene.children, true );
-
-  	if ( intersects.length >  0 && intersects[0].object.geometry.type != 'PlaneGeometry' ) {
-  		if ( intersects[ 0 ].object != INTERSECTED )	{
-  			INTERSECTED = intersects[ 0 ].object;
-  			INTERSECTED.currentHex = INTERSECTED.material.color.getHex();
-  			INTERSECTED.material.color.setHex( 0x6bdae9 );
-  		}
-    } else {
-  		if ( INTERSECTED ) INTERSECTED.material.color.setHex( INTERSECTED.currentHex );
-  		INTERSECTED = null;
-  	}
-  }
-
   function animate() {
     requestAnimationFrame(animate);
-    if (!vPrev) controls.getDirection(vPrev);
     updateControls();
-    updateRay();
-    moveEnemy();
-    moveProj();
     renderer.render(scene, camera);
   }
 
-  function spawnEnemy(x, z) {
-    var enemy = new THREE.Mesh( evilGeo, evilMat );
-    enemy.direction = -1;
-    enemy.dist = 0;
-    enemy.position.y = 3;
-    enemy.position.z = z;
-    enemy.position.x = x;
-    scene.add(enemy);
-    enemies.push(enemy);
-    return enemy;
-  }
+  function createRoom() {
+    // floor
+    var floorGeo = new THREE.PlaneGeometry(200, 200, 5, 5);
+		floorGeo.applyMatrix(new THREE.Matrix4().makeRotationX(- Math.PI/2));
+		var floorTex = new THREE.TextureLoader().load('textures/floor.jpg');
+		floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
+		floorTex.repeat.set(8, 8);
+		var floorMat = new THREE.MeshBasicMaterial({ color: "rgb(255, 255, 255)", map: floorTex});
+	  var floorMesh = new THREE.Mesh(floorGeo, floorMat);
+    scene.add(floorMesh);
 
-  function toggleFullScreen(elem) {
-    if ((document.fullScreenElement !== undefined && document.fullScreenElement === null) ||
-        (document.msFullscreenElement !== undefined && document.msFullscreenElement === null) ||
-        (document.mozFullScreen !== undefined && !document.mozFullScreen) ||
-        (document.webkitIsFullScreen !== undefined && !document.webkitIsFullScreen)) {
-                  if (elem.requestFullScreen) { elem.requestFullScreen();
-                  } else if (elem.mozRequestFullScreen) { elem.mozRequestFullScreen();
-                  } else if (elem.webkitRequestFullScreen) { elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
-                  } else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
-    } else {
-        if (document.cancelFullScreen) {
-            document.cancelFullScreen();
-        } else if (document.mozCancelFullScreen) {
-            document.mozCancelFullScreen();
-        } else if (document.webkitCancelFullScreen) {
-            document.webkitCancelFullScreen();
-        } else if (document.msExitFullscreen) {
-            document.msExitFullscreen();
-        }
-    }
-          }
+    // roof
+    var roofGeo = new THREE.PlaneGeometry(200, 200, 5, 5);
+		roofGeo.applyMatrix(new THREE.Matrix4().makeRotationX(- Math.PI/2));
+		var roofTex = new THREE.TextureLoader().load('textures/floor.jpg');
+		roofTex.wrapS = roofTex.wrapT = THREE.RepeatWrapping;
+		roofTex.repeat.set(8, 8);
+		var roofMat = new THREE.MeshBasicMaterial({ color: "rgb(255, 255, 255)", map: roofTex, side: THREE.DoubleSide});
+	  var roofMesh = new THREE.Mesh(roofGeo, roofMat);
+    roofMesh.position.set(0, 50, 0);
+    scene.add(roofMesh);
 
-  function moveEnemy() {
-    for (var i in enemies) {
-      if (enemies[i].dist == 50 || enemies[i].dist === 0) {
-        enemies[i].direction *= -1;
-      }
-      enemies[i].position.z += enemies[i].direction*0.5;
-      enemies[i].dist += enemies[i].direction*0.5;
-    }
+    // walls
+    var wallGeo = new THREE.PlaneGeometry(200, 100, 5, 5);
+		var wallTex = new THREE.TextureLoader().load('textures/floor.jpg');
+		wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+		wallTex.repeat.set(8, 4);
+		var wallMat = new THREE.MeshBasicMaterial({ color: "rgb(255, 255, 255)", map: wallTex, side: THREE.DoubleSide});
+
+    var wallMesh = new THREE.Mesh(wallGeo, wallMat);
+    wallMesh.position.set(0, 0, 100);
+    scene.add(wallMesh);
+
+    var wallMesh = new THREE.Mesh(wallGeo, wallMat);
+    wallMesh.position.set(0, 0, -100);
+    scene.add(wallMesh);
+
+    var wallGeo = new THREE.PlaneGeometry(200, 100, 5, 5);
+    wallGeo.applyMatrix(new THREE.Matrix4().makeRotationY(- Math.PI/2));
+
+    var wallMesh = new THREE.Mesh(wallGeo, wallMat);
+    wallMesh.position.set(100, 0, 0);
+    scene.add(wallMesh);
+
+    var wallMesh = new THREE.Mesh(wallGeo, wallMat);
+    wallMesh.position.set(-100, 0, 0);
+    scene.add(wallMesh);
   }
 
   function createFloor() {
     geometry = new THREE.PlaneGeometry(2000, 2000, 5, 5);
 		geometry.applyMatrix(new THREE.Matrix4().makeRotationX(- Math.PI/2));
-		var texture = new THREE.TextureLoader().load('wall.jpg');
+		var texture = new THREE.TextureLoader().load('textures/floor.jpg');
 		texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 		texture.repeat.set(16, 16);
 		material = new THREE.MeshBasicMaterial({ color: "rgb(255, 255, 255)", map: texture});
 	  return new THREE.Mesh(geometry, material);
   }
 
-  function checkForPointerLock() {
+  function checkPointerLock() {
     return 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
   }
 
   function initPointerLock() {
     var element = document.body;
-    if (havePointerLock) {
+    if (pLockEnabled) {
       var pointerlockchange = function (event) {
         if (document.pointerLockElement === element ||
             document.mozPointerLockElement === element ||
@@ -280,7 +218,6 @@
   function initControls() {
     document.addEventListener('keydown', onKeyDown, false);
     document.addEventListener('keyup', onKeyUp, false);
-    // raycaster = new THREE.Raycaster(new THREE.Vector3(), new THREE.Vector3(0, -1, 0), 0, 2);
   }
 
   function updateControls() {
@@ -308,28 +245,6 @@
         velocity.y = 0;
         controls.getObject().position.y = 10;
         canJump = true;
-      }
-
-      // FIXME interaction
-      if (selObj && selObj.pickedUp) {
-        var pos = new THREE.Vector3();
-        pos = controls.getObject().position;
-        var dir = new THREE.Vector3();
-        controls.getDirection(dir);
-        var vCurr = new THREE.Vector3();
-        controls.getDirection(vCurr);
-        var quat = new THREE.Quaternion();
-        quat.setFromUnitVectors(vPrev, vCurr);
-        controls.getDirection(vPrev);
-
-        selObj.position = selObj.position.addVectors(dir.multiplyScalar(15),pos).applyQuaternion(quat);
-
-        // TODO rotate cube along with camera
-      }
-      if (selObj && !selObj.pickedUp) {
-        selObj.position.y = 3;
-        INTERSECTED = null;
-        selObj = null;
       }
     }
   }
