@@ -29,7 +29,14 @@
     // cool fog effect, think bedrock in minecraft
     // scene.fog = new THREE.FogExp2("rgb(0,0,0)", 0.015);
 
+    // light
+    var light = new THREE.AmbientLight( 0x404040 );
+    scene.add( light );
+
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
+    var pointLight = new THREE.PointLight( "rgb(223, 165, 52)", 1, 100);
+    pointLight.castShadow = true;
+    camera.add( pointLight );
 
 		scene.add(camera);
 
@@ -39,6 +46,7 @@
     createRoom();
 
     renderer = new THREE.WebGLRenderer();
+    renderer.shadowMapEnabled = true;
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor("rgb(20, 20, 34)");
     document.body.appendChild(renderer.domElement);
@@ -53,23 +61,25 @@
   function createRoom() {
     // floor
     var floorGeo = new THREE.PlaneGeometry(200, 200, 5, 5);
-		floorGeo.applyMatrix(new THREE.Matrix4().makeRotationX(- Math.PI/2));
-		var floorTex = new THREE.TextureLoader().load('textures/floor.jpg');
+		var floorTex = new THREE.ImageUtils.loadTexture( 'textures/floor.jpg' );
 		floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
 		floorTex.repeat.set(8, 8);
-		var floorMat = new THREE.MeshBasicMaterial({ color: "rgb(255, 255, 255)", map: floorTex});
+		var floorMat = new THREE.MeshLambertMaterial({ map: floorTex, side: THREE.DoubleSide });
 	  var floorMesh = new THREE.Mesh(floorGeo, floorMat);
+    floorMesh.rotation.x = Math.PI/2;
+    floorMesh.receiveShadow = true;
     scene.add(floorMesh);
 
     // roof
     var roofGeo = new THREE.PlaneGeometry(200, 200, 5, 5);
-		roofGeo.applyMatrix(new THREE.Matrix4().makeRotationX(- Math.PI/2));
 		var roofTex = new THREE.TextureLoader().load('textures/floor.jpg');
 		roofTex.wrapS = roofTex.wrapT = THREE.RepeatWrapping;
 		roofTex.repeat.set(8, 8);
-		var roofMat = new THREE.MeshBasicMaterial({ color: "rgb(255, 255, 255)", map: roofTex, side: THREE.DoubleSide});
+		var roofMat = new THREE.MeshLambertMaterial({ color: "rgb(255, 255, 255)", map: roofTex, side: THREE.DoubleSide});
 	  var roofMesh = new THREE.Mesh(roofGeo, roofMat);
+    roofMesh.rotation.x = Math.PI/2;
     roofMesh.position.set(0, 50, 0);
+    roofMesh.receiveShadow = true;
     scene.add(roofMesh);
 
     // walls
@@ -77,14 +87,16 @@
 		var wallTex = new THREE.TextureLoader().load('textures/floor.jpg');
 		wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
 		wallTex.repeat.set(8, 4);
-		var wallMat = new THREE.MeshBasicMaterial({ color: "rgb(255, 255, 255)", map: wallTex, side: THREE.DoubleSide});
+		var wallMat = new THREE.MeshLambertMaterial({ color: "rgb(255, 255, 255)", map: wallTex, side: THREE.DoubleSide});
 
     var wallMesh = new THREE.Mesh(wallGeo, wallMat);
     wallMesh.position.set(0, 0, 100);
+    wallMesh.receiveShadow = true;
     scene.add(wallMesh);
 
     wallMesh = new THREE.Mesh(wallGeo, wallMat);
     wallMesh.position.set(0, 0, -100);
+    wallMesh.receiveShadow = true;
     scene.add(wallMesh);
 
     wallGeo = new THREE.PlaneGeometry(200, 100, 5, 5);
@@ -92,11 +104,21 @@
 
     wallMesh = new THREE.Mesh(wallGeo, wallMat);
     wallMesh.position.set(100, 0, 0);
+    wallMesh.receiveShadow = true;
     scene.add(wallMesh);
 
     wallMesh = new THREE.Mesh(wallGeo, wallMat);
     wallMesh.position.set(-100, 0, 0);
+    wallMesh.receiveShadow = true;
     scene.add(wallMesh);
+
+    // torches
+    var geometry = new THREE.BoxGeometry( 2, 2, 2 );
+    var material = new THREE.MeshLambertMaterial( { color: 0x00ff00 } );
+    var cube = new THREE.Mesh( geometry, material );
+    cube.position.set(0, 1, -30);
+    cube.castShadow = true;
+    scene.add( cube );
   }
 
   function checkPointerLock() {
@@ -222,8 +244,6 @@
       if (moveBackward) velocity.z += walkSpd * delta;
       if (moveLeft) velocity.x -= walkSpd * delta;
       if (moveRight) velocity.x += walkSpd * delta;
-
-      // TODO check collision
 
       controls.getObject().translateX(velocity.x * delta);
       controls.getObject().translateY(velocity.y * delta);
