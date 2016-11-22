@@ -30,12 +30,11 @@
     // scene.fog = new THREE.FogExp2("rgb(0,0,0)", 0.015);
 
     // light
-    var light = new THREE.AmbientLight( 0x404040 );
+    var light = new THREE.AmbientLight( "rgb(48, 48, 61)" );
     scene.add( light );
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
-    var pointLight = new THREE.PointLight( "rgb(223, 165, 52)", 1, 100);
-    pointLight.castShadow = true;
+    var pointLight = new THREE.PointLight( "rgb(223, 160, 52)", 1, 100);
     camera.add( pointLight );
 
 		scene.add(camera);
@@ -46,7 +45,7 @@
     createRoom();
 
     renderer = new THREE.WebGLRenderer();
-    renderer.shadowMapEnabled = true;
+    renderer.shadowMap.enabled = true;
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setClearColor("rgb(20, 20, 34)");
     document.body.appendChild(renderer.domElement);
@@ -61,7 +60,7 @@
   function createRoom() {
     // floor
     var floorGeo = new THREE.PlaneGeometry(200, 200, 5, 5);
-		var floorTex = new THREE.ImageUtils.loadTexture( 'textures/floor.jpg' );
+		var floorTex = new THREE.TextureLoader().load('textures/floor.jpg' );
 		floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
 		floorTex.repeat.set(8, 8);
 		var floorMat = new THREE.MeshLambertMaterial({ map: floorTex, side: THREE.DoubleSide });
