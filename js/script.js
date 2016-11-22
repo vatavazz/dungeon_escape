@@ -26,7 +26,8 @@
 
 		var loader = new THREE.TextureLoader();
 
-    scene.fog = new THREE.Fog("rgb(20, 20, 34)", 0, 750);
+    // cool fog effect, think bedrock in minecraft
+    // scene.fog = new THREE.FogExp2("rgb(0,0,0)", 0.015);
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
 
@@ -36,9 +37,6 @@
     scene.add(controls.getObject());
 
     createRoom();
-
-    // floor
-    //scene.add(createFloor());
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -85,30 +83,20 @@
     wallMesh.position.set(0, 0, 100);
     scene.add(wallMesh);
 
-    var wallMesh = new THREE.Mesh(wallGeo, wallMat);
+    wallMesh = new THREE.Mesh(wallGeo, wallMat);
     wallMesh.position.set(0, 0, -100);
     scene.add(wallMesh);
 
-    var wallGeo = new THREE.PlaneGeometry(200, 100, 5, 5);
+    wallGeo = new THREE.PlaneGeometry(200, 100, 5, 5);
     wallGeo.applyMatrix(new THREE.Matrix4().makeRotationY(- Math.PI/2));
 
-    var wallMesh = new THREE.Mesh(wallGeo, wallMat);
+    wallMesh = new THREE.Mesh(wallGeo, wallMat);
     wallMesh.position.set(100, 0, 0);
     scene.add(wallMesh);
 
-    var wallMesh = new THREE.Mesh(wallGeo, wallMat);
+    wallMesh = new THREE.Mesh(wallGeo, wallMat);
     wallMesh.position.set(-100, 0, 0);
     scene.add(wallMesh);
-  }
-
-  function createFloor() {
-    geometry = new THREE.PlaneGeometry(2000, 2000, 5, 5);
-		geometry.applyMatrix(new THREE.Matrix4().makeRotationX(- Math.PI/2));
-		var texture = new THREE.TextureLoader().load('textures/floor.jpg');
-		texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-		texture.repeat.set(16, 16);
-		material = new THREE.MeshBasicMaterial({ color: "rgb(255, 255, 255)", map: texture});
-	  return new THREE.Mesh(geometry, material);
   }
 
   function checkPointerLock() {
@@ -241,10 +229,29 @@
       controls.getObject().translateY(velocity.y * delta);
       controls.getObject().translateZ(velocity.z * delta);
 
+      // out of bounds
       if (controls.getObject().position.y < 10) {
         velocity.y = 0;
         controls.getObject().position.y = 10;
         canJump = true;
+      }
+
+      if (controls.getObject().position.x < -95) {
+        velocity.x = 0;
+        controls.getObject().position.x = -95;
+      }
+      if (controls.getObject().position.x > 95) {
+        velocity.x = 0;
+        controls.getObject().position.x = 95;
+      }
+
+      if (controls.getObject().position.z < -95) {
+        velocity.z = 0;
+        controls.getObject().position.z = -95;
+      }
+      if (controls.getObject().position.z > 95) {
+        velocity.z = 0;
+        controls.getObject().position.z = 95;
       }
     }
   }
