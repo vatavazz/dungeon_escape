@@ -127,7 +127,7 @@
     wall.castShadow = true;
     scene.add( wall );
 
-    var wall = new THREE.Mesh( geometry, material );
+    wall = new THREE.Mesh( geometry, material );
     wall.position.set(-30, 20, 80);
     wall.castShadow = true;
     scene.add( wall );
@@ -184,25 +184,25 @@
     torch.position.set(25, 25, 55);
     scene.add( torch );
 
-    var torch = new THREE.Mesh( geometry, material );
+    torch = new THREE.Mesh( geometry, material );
     torch.position.set(-25, 25, 55);
     scene.add( torch );
 
     // 2nd row
-    var torch = new THREE.Mesh( geometry, material );
+    torch = new THREE.Mesh( geometry, material );
     torch.position.set(25, 25, 5);
     scene.add( torch );
 
-    var torch = new THREE.Mesh( geometry, material );
+    torch = new THREE.Mesh( geometry, material );
     torch.position.set(-25, 25, 5);
     scene.add( torch );
 
     // 3rd row
-    var torch = new THREE.Mesh( geometry, material );
+    torch = new THREE.Mesh( geometry, material );
     torch.position.set(25, 25, -45);
     scene.add( torch );
 
-    var torch = new THREE.Mesh( geometry, material );
+    torch = new THREE.Mesh( geometry, material );
     torch.position.set(-25, 25, -45);
     scene.add( torch );
   }
