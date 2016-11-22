@@ -72,32 +72,32 @@
     scene.add(floorMesh);
 
     // roof
-    var roofGeo = new THREE.PlaneGeometry(140, 200, 5, 5);
 		var roofTex = new THREE.TextureLoader().load('textures/floor.jpg');
 		roofTex.wrapS = roofTex.wrapT = THREE.RepeatWrapping;
 		roofTex.repeat.set(8, 8);
 		var roofMat = new THREE.MeshLambertMaterial({ map: roofTex, side: THREE.DoubleSide});
 
-	  var roofMesh = new THREE.Mesh(roofGeo, roofMat);
+    var roofGeo = new THREE.CylinderGeometry( 70, 70, 200, 32, 32, true, 0, 3.15 );
+    var roofMesh = new THREE.Mesh( roofGeo, roofMat );
     roofMesh.rotation.x = Math.PI/2;
-    roofMesh.position.set(0, 100, 0);
-    roofMesh.receiveShadow = true;
-    scene.add(roofMesh);
+    roofMesh.rotation.y = Math.PI/2;
+    roofMesh.position.set(0,100,0);
+    scene.add( roofMesh );
 
     // walls
-    var wallGeo = new THREE.PlaneGeometry(140, 100, 5, 5);
+    var wallGeo = new THREE.PlaneGeometry(140, 170, 5, 5);
 		var wallTex = new THREE.TextureLoader().load('textures/floor.jpg');
 		wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
 		wallTex.repeat.set(8, 4);
 		var wallMat = new THREE.MeshLambertMaterial({ map: wallTex, side: THREE.DoubleSide});
 
     var wallMesh = new THREE.Mesh(wallGeo, wallMat);
-    wallMesh.position.set(0, 50, 100);
+    wallMesh.position.set(0, 85, 100);
     wallMesh.receiveShadow = true;
     scene.add(wallMesh);
 
     wallMesh = new THREE.Mesh(wallGeo, wallMat);
-    wallMesh.position.set(0, 50, -100);
+    wallMesh.position.set(0, 85, -100);
     wallMesh.receiveShadow = true;
     scene.add(wallMesh);
 
@@ -116,7 +116,7 @@
 
     createWall();
     createPillars();
-
+    createTorches();
   }
 
   function createWall() {
@@ -133,42 +133,78 @@
     scene.add( wall );
   }
 
+  function parabCyl() {
+
+  }
+
   function createPillars() {
-    var geometry = new THREE.BoxGeometry( 10, 100, 10 );
+    var geometry = new THREE.BoxGeometry( 10, 170, 10 );
     var material = new THREE.MeshPhongMaterial( { color: "rgb(71, 71, 70)" } );
 
     // 1st row
     var pillar = new THREE.Mesh( geometry, material );
-    pillar.position.set(30, 50, 55);
+    pillar.position.set(30, 85, 55);
     pillar.castShadow = true;
     scene.add( pillar );
 
     pillar = new THREE.Mesh( geometry, material );
-    pillar.position.set(-30, 50, 55);
+    pillar.position.set(-30, 85, 55);
     pillar.castShadow = true;
     scene.add( pillar );
 
     // 2nd row
     pillar = new THREE.Mesh( geometry, material );
-    pillar.position.set(30, 50, 5);
+    pillar.position.set(30, 85, 5);
     pillar.castShadow = true;
     scene.add( pillar );
 
     pillar = new THREE.Mesh( geometry, material );
-    pillar.position.set(-30, 50, 5);
+    pillar.position.set(-30, 85, 5);
     pillar.castShadow = true;
     scene.add( pillar );
 
     // 3rd row
     pillar = new THREE.Mesh( geometry, material );
-    pillar.position.set(30, 50, -45);
+    pillar.position.set(30, 85, -45);
     pillar.castShadow = true;
     scene.add( pillar );
 
     pillar = new THREE.Mesh( geometry, material );
-    pillar.position.set(-30, 50, -45);
+    pillar.position.set(-30, 85, -45);
     pillar.castShadow = true;
     scene.add( pillar );
+  }
+
+  function createTorches() {
+    var geometry = new THREE.SphereGeometry( 1, 16, 16 );
+    var material = new THREE.MeshBasicMaterial( { color: "rgb(241, 148, 61)" } );
+
+    // 1st row
+    var torch = new THREE.Mesh( geometry, material );
+    torch.position.set(25, 25, 55);
+    scene.add( torch );
+
+    var torch = new THREE.Mesh( geometry, material );
+    torch.position.set(-25, 25, 55);
+    scene.add( torch );
+
+    // 2nd row
+    var torch = new THREE.Mesh( geometry, material );
+    torch.position.set(25, 25, 5);
+    scene.add( torch );
+
+    var torch = new THREE.Mesh( geometry, material );
+    torch.position.set(-25, 25, 5);
+    scene.add( torch );
+
+    // 3rd row
+    var torch = new THREE.Mesh( geometry, material );
+    torch.position.set(25, 25, -45);
+    scene.add( torch );
+
+    var torch = new THREE.Mesh( geometry, material );
+    torch.position.set(-25, 25, -45);
+    scene.add( torch );
   }
 
   function checkPointerLock() {
