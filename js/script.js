@@ -61,7 +61,7 @@
   function createRoom() {
     // floor
     var floorGeo = new THREE.PlaneGeometry(140, 200, 5, 5);
-		var floorTex = new THREE.TextureLoader().load('textures/floor.jpg' );
+		var floorTex = new THREE.TextureLoader().load('textures/bricks.png' );
 		floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
 		floorTex.repeat.set(8, 8);
 		var floorMat = new THREE.MeshLambertMaterial({ map: floorTex, side: THREE.DoubleSide });
@@ -72,7 +72,7 @@
     scene.add(floorMesh);
 
     // roof
-		var roofTex = new THREE.TextureLoader().load('textures/floor.jpg');
+		var roofTex = new THREE.TextureLoader().load('textures/bricks.png');
 		roofTex.wrapS = roofTex.wrapT = THREE.RepeatWrapping;
 		roofTex.repeat.set(8, 8);
 		var roofMat = new THREE.MeshLambertMaterial({ map: roofTex, side: THREE.DoubleSide});
@@ -86,9 +86,9 @@
 
     // walls
     var wallGeo = new THREE.PlaneGeometry(140, 170, 5, 5);
-		var wallTex = new THREE.TextureLoader().load('textures/floor.jpg');
+		var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
 		wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
-		wallTex.repeat.set(8, 4);
+		wallTex.repeat.set(8, 8);
 		var wallMat = new THREE.MeshLambertMaterial({ map: wallTex, side: THREE.DoubleSide});
 
     var wallMesh = new THREE.Mesh(wallGeo, wallMat);
@@ -121,7 +121,8 @@
 
   function createWall() {
     var geometry = new THREE.BoxGeometry( 10, 40, 40 );
-    var material = new THREE.MeshPhongMaterial( { color: "rgb(108, 65, 28)" } );
+    var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
+    var material = new THREE.MeshLambertMaterial( { map: wallTex } );
     var wall = new THREE.Mesh( geometry, material );
     wall.position.set(30, 20, 80);
     wall.castShadow = true;
@@ -133,13 +134,12 @@
     scene.add( wall );
   }
 
-  function parabCyl() {
-
-  }
-
   function createPillars() {
     var geometry = new THREE.BoxGeometry( 10, 170, 10 );
-    var material = new THREE.MeshPhongMaterial( { color: "rgb(71, 71, 70)" } );
+    var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
+    wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+		wallTex.repeat.set(0.5, 4);
+    var material = new THREE.MeshLambertMaterial( { map: wallTex } );
 
     // 1st row
     var pillar = new THREE.Mesh( geometry, material );
@@ -179,6 +179,19 @@
     var geometry = new THREE.SphereGeometry( 1, 16, 16 );
     var material = new THREE.MeshBasicMaterial( { color: "rgb(241, 148, 61)" } );
 
+    // var spotLight = new THREE.SpotLight( "rgb(241, 148, 61)" );
+    // spotLight.position.set( 25, 25, 55 );
+    // spotLight.penumbra = 1;
+    // spotLight.distance = 100;
+    // scene.add( spotLight );
+
+var light;
+
+
+
+    // var spotLightHelper = new THREE.SpotLightHelper( spotLight );
+    // scene.add( spotLightHelper );
+
     // 1st row
     var torch = new THREE.Mesh( geometry, material );
     torch.position.set(25, 25, 55);
@@ -187,6 +200,13 @@
     torch = new THREE.Mesh( geometry, material );
     torch.position.set(-25, 25, 55);
     scene.add( torch );
+
+    light = new THREE.PointLight( "rgb(241, 148, 61)", 1, 80 );
+    light.position.set( 25, 25, 55 );
+    scene.add( light );
+    light = new THREE.PointLight( "rgb(241, 148, 61)", 1, 80 );
+    light.position.set( -25, 25, 55 );
+    scene.add( light );
 
     // 2nd row
     torch = new THREE.Mesh( geometry, material );
@@ -197,6 +217,13 @@
     torch.position.set(-25, 25, 5);
     scene.add( torch );
 
+    light = new THREE.PointLight( "rgb(241, 148, 61)", 1, 80 );
+    light.position.set( 25, 25, 5 );
+    scene.add( light );
+    light = new THREE.PointLight( "rgb(241, 148, 61)", 1, 80 );
+    light.position.set( -25, 25, 5 );
+    scene.add( light );
+
     // 3rd row
     torch = new THREE.Mesh( geometry, material );
     torch.position.set(25, 25, -45);
@@ -205,6 +232,13 @@
     torch = new THREE.Mesh( geometry, material );
     torch.position.set(-25, 25, -45);
     scene.add( torch );
+
+    light = new THREE.PointLight( "rgb(241, 148, 61)", 1, 80 );
+    light.position.set( 25, 25, -45 );
+    scene.add( light );
+    light = new THREE.PointLight( "rgb(241, 148, 61)", 1, 80 );
+    light.position.set( -25, 25, -45 );
+    scene.add( light );
   }
 
   function checkPointerLock() {
