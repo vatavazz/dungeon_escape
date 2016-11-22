@@ -40,6 +40,7 @@
 		scene.add(camera);
 
     controls = new THREE.PointerLockControls(camera);
+    controls.getObject().position.z = 95;
     scene.add(controls.getObject());
 
     createRoom();
@@ -59,42 +60,44 @@
 
   function createRoom() {
     // floor
-    var floorGeo = new THREE.PlaneGeometry(200, 200, 5, 5);
+    var floorGeo = new THREE.PlaneGeometry(140, 200, 5, 5);
 		var floorTex = new THREE.TextureLoader().load('textures/floor.jpg' );
 		floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
 		floorTex.repeat.set(8, 8);
 		var floorMat = new THREE.MeshLambertMaterial({ map: floorTex, side: THREE.DoubleSide });
+
 	  var floorMesh = new THREE.Mesh(floorGeo, floorMat);
     floorMesh.rotation.x = Math.PI/2;
     floorMesh.receiveShadow = true;
     scene.add(floorMesh);
 
     // roof
-    var roofGeo = new THREE.PlaneGeometry(200, 200, 5, 5);
+    var roofGeo = new THREE.PlaneGeometry(140, 200, 5, 5);
 		var roofTex = new THREE.TextureLoader().load('textures/floor.jpg');
 		roofTex.wrapS = roofTex.wrapT = THREE.RepeatWrapping;
 		roofTex.repeat.set(8, 8);
-		var roofMat = new THREE.MeshLambertMaterial({ color: "rgb(255, 255, 255)", map: roofTex, side: THREE.DoubleSide});
+		var roofMat = new THREE.MeshLambertMaterial({ map: roofTex, side: THREE.DoubleSide});
+
 	  var roofMesh = new THREE.Mesh(roofGeo, roofMat);
     roofMesh.rotation.x = Math.PI/2;
-    roofMesh.position.set(0, 50, 0);
+    roofMesh.position.set(0, 100, 0);
     roofMesh.receiveShadow = true;
     scene.add(roofMesh);
 
     // walls
-    var wallGeo = new THREE.PlaneGeometry(200, 100, 5, 5);
+    var wallGeo = new THREE.PlaneGeometry(140, 100, 5, 5);
 		var wallTex = new THREE.TextureLoader().load('textures/floor.jpg');
 		wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
 		wallTex.repeat.set(8, 4);
-		var wallMat = new THREE.MeshLambertMaterial({ color: "rgb(255, 255, 255)", map: wallTex, side: THREE.DoubleSide});
+		var wallMat = new THREE.MeshLambertMaterial({ map: wallTex, side: THREE.DoubleSide});
 
     var wallMesh = new THREE.Mesh(wallGeo, wallMat);
-    wallMesh.position.set(0, 0, 100);
+    wallMesh.position.set(0, 50, 100);
     wallMesh.receiveShadow = true;
     scene.add(wallMesh);
 
     wallMesh = new THREE.Mesh(wallGeo, wallMat);
-    wallMesh.position.set(0, 0, -100);
+    wallMesh.position.set(0, 50, -100);
     wallMesh.receiveShadow = true;
     scene.add(wallMesh);
 
@@ -102,22 +105,70 @@
     wallGeo.applyMatrix(new THREE.Matrix4().makeRotationY(- Math.PI/2));
 
     wallMesh = new THREE.Mesh(wallGeo, wallMat);
-    wallMesh.position.set(100, 0, 0);
+    wallMesh.position.set(70, 50, 0);
     wallMesh.receiveShadow = true;
     scene.add(wallMesh);
 
     wallMesh = new THREE.Mesh(wallGeo, wallMat);
-    wallMesh.position.set(-100, 0, 0);
+    wallMesh.position.set(-70, 50, 0);
     wallMesh.receiveShadow = true;
     scene.add(wallMesh);
 
-    // torches
-    var geometry = new THREE.BoxGeometry( 2, 2, 2 );
-    var material = new THREE.MeshLambertMaterial( { color: 0x00ff00 } );
-    var cube = new THREE.Mesh( geometry, material );
-    cube.position.set(0, 1, -30);
-    cube.castShadow = true;
-    scene.add( cube );
+    createWall();
+    createPillars();
+
+  }
+
+  function createWall() {
+    var geometry = new THREE.BoxGeometry( 10, 40, 40 );
+    var material = new THREE.MeshPhongMaterial( { color: "rgb(108, 65, 28)" } );
+    var wall = new THREE.Mesh( geometry, material );
+    wall.position.set(30, 20, 80);
+    wall.castShadow = true;
+    scene.add( wall );
+
+    var wall = new THREE.Mesh( geometry, material );
+    wall.position.set(-30, 20, 80);
+    wall.castShadow = true;
+    scene.add( wall );
+  }
+
+  function createPillars() {
+    var geometry = new THREE.BoxGeometry( 10, 100, 10 );
+    var material = new THREE.MeshPhongMaterial( { color: "rgb(71, 71, 70)" } );
+
+    // 1st row
+    var pillar = new THREE.Mesh( geometry, material );
+    pillar.position.set(30, 50, 55);
+    pillar.castShadow = true;
+    scene.add( pillar );
+
+    pillar = new THREE.Mesh( geometry, material );
+    pillar.position.set(-30, 50, 55);
+    pillar.castShadow = true;
+    scene.add( pillar );
+
+    // 2nd row
+    pillar = new THREE.Mesh( geometry, material );
+    pillar.position.set(30, 50, 5);
+    pillar.castShadow = true;
+    scene.add( pillar );
+
+    pillar = new THREE.Mesh( geometry, material );
+    pillar.position.set(-30, 50, 5);
+    pillar.castShadow = true;
+    scene.add( pillar );
+
+    // 3rd row
+    pillar = new THREE.Mesh( geometry, material );
+    pillar.position.set(30, 50, -45);
+    pillar.castShadow = true;
+    scene.add( pillar );
+
+    pillar = new THREE.Mesh( geometry, material );
+    pillar.position.set(-30, 50, -45);
+    pillar.castShadow = true;
+    scene.add( pillar );
   }
 
   function checkPointerLock() {
@@ -254,24 +305,24 @@
         controls.getObject().position.y = 10;
         canJump = true;
       }
-
-      if (controls.getObject().position.x < -95) {
-        velocity.x = 0;
-        controls.getObject().position.x = -95;
-      }
-      if (controls.getObject().position.x > 95) {
-        velocity.x = 0;
-        controls.getObject().position.x = 95;
-      }
-
-      if (controls.getObject().position.z < -95) {
-        velocity.z = 0;
-        controls.getObject().position.z = -95;
-      }
-      if (controls.getObject().position.z > 95) {
-        velocity.z = 0;
-        controls.getObject().position.z = 95;
-      }
+      //
+      // if (controls.getObject().position.x < -95) {
+      //   velocity.x = 0;
+      //   controls.getObject().position.x = -95;
+      // }
+      // if (controls.getObject().position.x > 95) {
+      //   velocity.x = 0;
+      //   controls.getObject().position.x = 95;
+      // }
+      //
+      // if (controls.getObject().position.z < -95) {
+      //   velocity.z = 0;
+      //   controls.getObject().position.z = -95;
+      // }
+      // if (controls.getObject().position.z > 95) {
+      //   velocity.z = 0;
+      //   controls.getObject().position.z = 95;
+      // }
     }
   }
 
