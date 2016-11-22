@@ -55,6 +55,8 @@
   function init() {
     initControls();
     initPointerLock();
+    toggleFullScreen(document.body);
+
     projector = new THREE.Projector();
 
     clock = new THREE.Clock();
@@ -79,34 +81,6 @@
 
     // floor
     scene.add(createFloor());
-
-    // var loader = new THREE.ObjectLoader();
-    // var jLoader = new THREE.JSONLoader();
-    // var jObj;
-    // $.ajax({
-    //   url: 'skull.json',
-    //   async: false,
-    //   dataType: 'json',
-    //   success: function (response) {
-    //     jObj = response;
-    //   }
-    // });
-
-    // var skull = loader.parse(jObj);
-    // skull.position.z = 50;
-    // scene.add(skull);
-
-    // var sphere =  new THREE.Mesh( new THREE.SphereGeometry(3,16,16),
-    //               new THREE.MeshLambertMaterial( {color: "rgb(221, 28, 28)" } ));
-    // sphere.position.y = 3;
-    // scene.add(sphere);
-    //
-    // var geometry = new THREE.BoxGeometry( 6, 6, 6 );
-		// var material = new THREE.MeshBasicMaterial( { map: new THREE.TextureLoader().load('floor.jpg') } );
-		// var cube = new THREE.Mesh( geometry, material );
-    // cube.position.z = -50;
-    // cube.position.y = 3;
-		// scene.add( cube );
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -156,6 +130,28 @@
     enemies.push(enemy);
     return enemy;
   }
+
+  function toggleFullScreen(elem) {
+    if ((document.fullScreenElement !== undefined && document.fullScreenElement === null) ||
+        (document.msFullscreenElement !== undefined && document.msFullscreenElement === null) ||
+        (document.mozFullScreen !== undefined && !document.mozFullScreen) ||
+        (document.webkitIsFullScreen !== undefined && !document.webkitIsFullScreen)) {
+                  if (elem.requestFullScreen) { elem.requestFullScreen();
+                  } else if (elem.mozRequestFullScreen) { elem.mozRequestFullScreen();
+                  } else if (elem.webkitRequestFullScreen) { elem.webkitRequestFullScreen(Element.ALLOW_KEYBOARD_INPUT);
+                  } else if (elem.msRequestFullscreen) { elem.msRequestFullscreen(); }
+    } else {
+        if (document.cancelFullScreen) {
+            document.cancelFullScreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.webkitCancelFullScreen) {
+            document.webkitCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    }
+          }
 
   function moveEnemy() {
     for (var i in enemies) {
@@ -332,6 +328,7 @@
       }
       if (selObj && !selObj.pickedUp) {
         selObj.position.y = 3;
+        INTERSECTED = null;
         selObj = null;
       }
     }
