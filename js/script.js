@@ -34,13 +34,10 @@
     scene.add( light );
 
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
-    var pointLight = new THREE.PointLight( "rgb(223, 160, 52)", 1, 100);
-    camera.add( pointLight );
 
 		scene.add(camera);
 
     controls = new THREE.PointerLockControls(camera);
-    controls.getObject().position.z = 95;
     scene.add(controls.getObject());
 
     createRoom();
@@ -173,24 +170,24 @@
     pillar.position.set(-30, 85, -45);
     pillar.castShadow = true;
     scene.add( pillar );
+
+    // 4th row
+    pillar = new THREE.Mesh( geometry, material );
+    pillar.position.set(30, 85, -95);
+    pillar.castShadow = true;
+    scene.add( pillar );
+
+    pillar = new THREE.Mesh( geometry, material );
+    pillar.position.set(-30, 85, -95);
+    pillar.castShadow = true;
+    scene.add( pillar );
   }
 
   function createTorches() {
     var geometry = new THREE.SphereGeometry( 1, 16, 16 );
     var material = new THREE.MeshBasicMaterial( { color: "rgb(241, 148, 61)" } );
 
-    // var spotLight = new THREE.SpotLight( "rgb(241, 148, 61)" );
-    // spotLight.position.set( 25, 25, 55 );
-    // spotLight.penumbra = 1;
-    // spotLight.distance = 100;
-    // scene.add( spotLight );
-
-var light;
-
-
-
-    // var spotLightHelper = new THREE.SpotLightHelper( spotLight );
-    // scene.add( spotLightHelper );
+    var light;
 
     // 1st row
     var torch = new THREE.Mesh( geometry, material );
@@ -201,10 +198,10 @@ var light;
     torch.position.set(-25, 25, 55);
     scene.add( torch );
 
-    light = new THREE.PointLight( "rgb(241, 148, 61)", 1, 80 );
+    light = new THREE.PointLight( "rgb(241, 148, 61)", 0.6, 80 );
     light.position.set( 25, 25, 55 );
     scene.add( light );
-    light = new THREE.PointLight( "rgb(241, 148, 61)", 1, 80 );
+    light = new THREE.PointLight( "rgb(241, 148, 61)", 0.6, 80 );
     light.position.set( -25, 25, 55 );
     scene.add( light );
 
@@ -217,10 +214,10 @@ var light;
     torch.position.set(-25, 25, 5);
     scene.add( torch );
 
-    light = new THREE.PointLight( "rgb(241, 148, 61)", 1, 80 );
+    light = new THREE.PointLight( "rgb(241, 148, 61)", 0.3, 80 );
     light.position.set( 25, 25, 5 );
     scene.add( light );
-    light = new THREE.PointLight( "rgb(241, 148, 61)", 1, 80 );
+    light = new THREE.PointLight( "rgb(241, 148, 61)", 0.3, 80 );
     light.position.set( -25, 25, 5 );
     scene.add( light );
 
@@ -233,10 +230,10 @@ var light;
     torch.position.set(-25, 25, -45);
     scene.add( torch );
 
-    light = new THREE.PointLight( "rgb(241, 148, 61)", 1, 80 );
+    light = new THREE.PointLight( "rgb(241, 148, 61)", 0.2, 80 );
     light.position.set( 25, 25, -45 );
     scene.add( light );
-    light = new THREE.PointLight( "rgb(241, 148, 61)", 1, 80 );
+    light = new THREE.PointLight( "rgb(241, 148, 61)", 0.2, 80 );
     light.position.set( -25, 25, -45 );
     scene.add( light );
   }
