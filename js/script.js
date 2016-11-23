@@ -1,4 +1,9 @@
 (function() {
+  'use strict';
+
+  Physijs.scripts.worker = 'js/physijs_worker.js';
+  Physijs.scripts.ammo = 'js/ammo.js';
+
   var clock;
   var scene, camera, renderer;
   var geometry, material, mesh;
@@ -11,6 +16,7 @@
       sprint,
       canJump;
   var velocity = new THREE.Vector3();
+  var footstep = new Audio('sfx/step.wav');
 
   init();
   animate();
@@ -19,28 +25,27 @@
     initControls();
     initPointerLock();
 
-    projector = new THREE.Projector();
+    // projector = new THREE.Projector();
 
     clock = new THREE.Clock();
-    scene = new THREE.Scene();
+    scene = new Physijs.Scene;
 
 		var loader = new THREE.TextureLoader();
-
-    // cool fog effect, think bedrock in minecraft
-    // scene.fog = new THREE.FogExp2("rgb(0,0,0)", 0.015);
 
     // light
     var light = new THREE.AmbientLight( "rgb(48, 48, 61)" );
     scene.add( light );
 
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 10000);
-
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
 		scene.add(camera);
 
     controls = new THREE.PointerLockControls(camera);
-    scene.add(controls.getObject());
+    var controlsObj = controls.getObject();
+    scene.add(controlsObj);
 
-    createRoom();
+    window.addEventListener( 'resize', onWindowResize, false );
+
+    createRoom1();
 
     renderer = new THREE.WebGLRenderer();
     renderer.shadowMap.enabled = true;
@@ -49,24 +54,27 @@
     document.body.appendChild(renderer.domElement);
   }
 
+  var handleCollision = function( collided_with, linearVelocity, angularVelocity ) {
+				alert("collision");
+			}
+
   function animate() {
     requestAnimationFrame(animate);
+    scene.simulate();
     updateControls();
     renderer.render(scene, camera);
   }
 
-  function createRoom() {
+  function createRoom1() {
+
     // floor
-    var floorGeo = new THREE.PlaneGeometry(140, 200, 5, 5);
 		var floorTex = new THREE.TextureLoader().load('textures/bricks.png' );
 		floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
 		floorTex.repeat.set(8, 8);
-		var floorMat = new THREE.MeshLambertMaterial({ map: floorTex, side: THREE.DoubleSide });
-
-	  var floorMesh = new THREE.Mesh(floorGeo, floorMat);
-    floorMesh.rotation.x = Math.PI/2;
-    floorMesh.receiveShadow = true;
-    scene.add(floorMesh);
+		var floorMat = new THREE.MeshLambertMaterial({ map: floorTex });
+    var floor = new Physijs.BoxMesh( new THREE.BoxGeometry(140, 1, 200), floorMat, 0);
+    floor.receiveShadow = true;
+    scene.add(floor);
 
     // roof
 		var roofTex = new THREE.TextureLoader().load('textures/bricks.png');
@@ -75,7 +83,7 @@
 		var roofMat = new THREE.MeshLambertMaterial({ map: roofTex, side: THREE.DoubleSide});
 
     var roofGeo = new THREE.CylinderGeometry( 70, 70, 200, 32, 32, true, 0, 3.15 );
-    var roofMesh = new THREE.Mesh( roofGeo, roofMat );
+    var roofMesh = new Physijs.ConeMesh( roofGeo, roofMat );
     roofMesh.rotation.x = Math.PI/2;
     roofMesh.rotation.y = Math.PI/2;
     roofMesh.position.set(0,100,0);
@@ -111,6 +119,11 @@
     wallMesh.receiveShadow = true;
     scene.add(wallMesh);
 
+    var colli = new Physijs.BoxMesh( new THREE.CubeGeometry( 5, 5, 5 ), new THREE.MeshBasicMaterial({ color: 0x888888 }));
+    //colli.position.set(camera.positon);
+    scene.add( colli );
+    colli.addEventListener( 'collision', handleCollision );
+
     createWall();
     createPillars();
     createTorches();
@@ -120,13 +133,21 @@
     var geometry = new THREE.BoxGeometry( 10, 40, 40 );
     var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
     var material = new THREE.MeshLambertMaterial( { map: wallTex } );
-    var wall = new THREE.Mesh( geometry, material );
+
+    var wall = new Physijs.BoxMesh( geometry, material );
     wall.position.set(30, 20, 80);
     wall.castShadow = true;
     scene.add( wall );
 
     wall = new THREE.Mesh( geometry, material );
     wall.position.set(-30, 20, 80);
+    wall.castShadow = true;
+    scene.add( wall );
+
+    material = new THREE.MeshLambertMaterial( {color: "rgb(177, 177, 177)", map: wallTex } );
+    wall = new THREE.Mesh( geometry, material );
+    wall.rotation.y = Math.PI/2;
+    wall.position.set(0, 20, -95);
     wall.castShadow = true;
     scene.add( wall );
   }
@@ -139,45 +160,45 @@
     var material = new THREE.MeshLambertMaterial( { map: wallTex } );
 
     // 1st row
-    var pillar = new THREE.Mesh( geometry, material );
+    var pillar = new Physijs.BoxMesh( geometry, material );
     pillar.position.set(30, 85, 55);
     pillar.castShadow = true;
     scene.add( pillar );
 
-    pillar = new THREE.Mesh( geometry, material );
+    pillar = new Physijs.BoxMesh( geometry, material );
     pillar.position.set(-30, 85, 55);
     pillar.castShadow = true;
     scene.add( pillar );
 
     // 2nd row
-    pillar = new THREE.Mesh( geometry, material );
+    pillar = new Physijs.BoxMesh( geometry, material );
     pillar.position.set(30, 85, 5);
     pillar.castShadow = true;
     scene.add( pillar );
 
-    pillar = new THREE.Mesh( geometry, material );
+    pillar = new Physijs.BoxMesh( geometry, material );
     pillar.position.set(-30, 85, 5);
     pillar.castShadow = true;
     scene.add( pillar );
 
     // 3rd row
-    pillar = new THREE.Mesh( geometry, material );
+    pillar = new Physijs.BoxMesh( geometry, material );
     pillar.position.set(30, 85, -45);
     pillar.castShadow = true;
     scene.add( pillar );
 
-    pillar = new THREE.Mesh( geometry, material );
+    pillar = new Physijs.BoxMesh( geometry, material );
     pillar.position.set(-30, 85, -45);
     pillar.castShadow = true;
     scene.add( pillar );
 
     // 4th row
-    pillar = new THREE.Mesh( geometry, material );
+    pillar = new Physijs.BoxMesh( geometry, material );
     pillar.position.set(30, 85, -95);
     pillar.castShadow = true;
     scene.add( pillar );
 
-    pillar = new THREE.Mesh( geometry, material );
+    pillar = new Physijs.BoxMesh( geometry, material );
     pillar.position.set(-30, 85, -95);
     pillar.castShadow = true;
     scene.add( pillar );
@@ -351,7 +372,7 @@
     if (controlsEnabled) {
       var delta = clock.getDelta();
       var walkSpd = 200.0;
-      if (sprint) walkSpd = 600;
+      //if (sprint) walkSpd = 600;
 
       velocity.x -= velocity.x * 10.0 * delta;
       velocity.z -= velocity.z * 10.0 * delta;
@@ -361,6 +382,8 @@
       if (moveBackward) velocity.z += walkSpd * delta;
       if (moveLeft) velocity.x -= walkSpd * delta;
       if (moveRight) velocity.x += walkSpd * delta;
+
+      if (moveForward || moveBackward || moveLeft || moveRight) footstep.play();
 
       controls.getObject().translateX(velocity.x * delta);
       controls.getObject().translateY(velocity.y * delta);
@@ -372,6 +395,7 @@
         controls.getObject().position.y = 10;
         canJump = true;
       }
+
       //
       // if (controls.getObject().position.x < -95) {
       //   velocity.x = 0;
@@ -391,6 +415,13 @@
       //   controls.getObject().position.z = 95;
       // }
     }
+  }
+
+  function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize( window.innerWidth, window.innerHeight );
   }
 
 })();
