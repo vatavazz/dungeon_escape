@@ -1,12 +1,12 @@
 /**
  * @author mrdoob / http://mrdoob.com/
- * @author schteppe / https://github.com/schteppe
+ * edited by vatavazz
  */
  var PointerLockControls = function ( camera, player ) {
 
-    var eyeYPos = 10; // eyes are 2 meters above the ground
-    var velocityFactor = 0.7;
-    var jumpVelocity = 20;
+    var eyeYPos = 10;
+    var velocityFactor = 0.9;
+    var jumpVelocity = 80;
     var scope = this;
 
     var pitchObject = new THREE.Object3D();
@@ -126,6 +126,7 @@
 			euler.x = pitchObject.rotation.x;
 			euler.y = yawObject.rotation.y;
 			euler.order = "XYZ";
+      // get rid of gimble lock
 			quat.setFromEuler(euler);
 			inputVelocity.applyQuaternion(quat);
 
