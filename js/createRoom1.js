@@ -126,6 +126,7 @@ var createRoom1 = function (world, scene) {
     boxBody = new CANNON.Body({ mass: 0 });
     boxBody.addShape(boxShape);
     boxBody.position.set(0, 20, -95);
+    boxBody.name = "levelEnd";
     world.add(boxBody)
   }
   function createPillars() {

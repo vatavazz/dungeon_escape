@@ -1,44 +1,28 @@
-var clock;
+// TODO create more levels (2-3 more)
+// TODO ad object interaction
+// TODO shoot projectile
+// TODO torch puzzle
+// TODO bridge
+
+var clock = new THREE.Clock();
 var scene, camera, renderer, world;
+var player;
 var pLockEnabled = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
 
 var controls;
 var footstep = new Audio('sfx/step.wav');
 var time = Date.now();
 
+var lvl = 1;
+
 initPointerLock();
 init();
 animate();
 
 function init() {
-  // cannon
   initWorld();
-
-  // player object
-  var playerShape = new CANNON.Sphere( 10 );
-  var player = new CANNON.Body({ mass: 5 });
-  player.addShape(playerShape);
-  player.position.set(0, 10, 85);
-  player.linearDamping = 0.98;
-  world.addBody(player);
-
-  // setting the scene and controls
-  clock = new THREE.Clock();
-  scene = new THREE.Scene;
-
-  var ambientLight = new THREE.AmbientLight( "rgb(48, 48, 61)" );
-  scene.add( ambientLight );
-
-  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-	scene.add(camera);
-
-  controls = new PointerLockControls( camera , player );
-  scene.add( controls.getObject() );
-
-  // create levels
+  createScene();
   createRoom1(world, scene);
-  // createRoom2(world, scene);
-  // createRoom3(world, scene);
 
   // renderer
   renderer = new THREE.WebGLRenderer();
@@ -49,6 +33,27 @@ function init() {
 
   document.body.appendChild(renderer.domElement);
   window.addEventListener( 'resize', onWindowResize, false );
+}
+
+function createScene() {
+  scene = new THREE.Scene;
+
+  // player object
+  var playerShape = new CANNON.Sphere( 10 );
+  var player = new CANNON.Body({ mass: 5 });
+  player.addShape(playerShape);
+  player.position.set(0, 10, 85);
+  player.linearDamping = 0.98;
+  world.addBody(player);
+
+  var ambientLight = new THREE.AmbientLight( "rgb(48, 48, 61)" );
+  scene.add( ambientLight );
+
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+	scene.add(camera);
+
+  controls = new PointerLockControls( camera , player );
+  scene.add( controls.getObject() );
 }
 
 function initWorld() {
@@ -63,9 +68,7 @@ function initWorld() {
 
   solver.iterations = 7;
   solver.tolerance = 0.1;
-  var split = true;
-  if (split) world.solver = new CANNON.SplitSolver(solver);
-  else world.solver = solver;
+  world.solver = new CANNON.SplitSolver(solver);
 
   world.gravity.set(0,-100,0);
   world.broadphase = new CANNON.NaiveBroadphase();
@@ -123,3 +126,21 @@ function onWindowResize() {
   camera.updateProjectionMatrix();
   renderer.setSize( window.innerWidth, window.innerHeight );
 }
+
+//     player.addEventListener("collide",function(e){
+//       if (e.body.name == "levelEnd") {
+//         console.log("next level!");
+//         lvl++;
+//         switch (lvl) {
+//           case 2:
+//             createRoom2(world, scene);
+//             break;
+//           case 3:
+//             createRoom3(world, scene);
+//             break;
+//         }
+//         // destroy scene, destroy world
+//         initWorld();
+//         createScene();
+//       }
+// });
