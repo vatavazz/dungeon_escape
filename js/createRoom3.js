@@ -126,7 +126,7 @@ var createRoom3 = function (world, scene) {
   wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
 	wallTex.repeat.set(1, 17);
   var pillarmaterial = new THREE.MeshLambertMaterial( { map:wallTex, color: "rgb(169, 177, 172)" } );
-  var pillarShape = new CANNON.Box(new CANNON.Vec3(5,50,5));
+  var pillarShape = new CANNON.Box(new CANNON.Vec3(5,85,5));
 
   // TODO torches
   var torch;
