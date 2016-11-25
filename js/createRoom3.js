@@ -100,18 +100,18 @@ var createRoom3 = function (world, scene) {
     [-75, 7.5, 0],
     [-75, 7.5, -150],
 
-    [0, 57.5, 75],
-    [-75, 57.5, 0]
+    [0, 67.5, 75],
+    [-75, 67.5, 0]
   ];
   var wall;
   var boxBody, boxShape;
   for (var pos in positions) {
     wall = new THREE.Mesh( geometry, material );
     wall.position.set(positions[pos][0], positions[pos][1], positions[pos][2]);
-    if (positions[pos][2] == 75) {
+    if (positions[pos][2] == 75 ) {
       boxShape = new CANNON.Box(new CANNON.Vec3(25,12.5,100));
       wall.rotation.y = Math.PI/2;
-    } else boxShape = new CANNON.Box(new CANNON.Vec3(100,12.5,15));
+    } else if (positions[pos][1] != 85) boxShape = new CANNON.Box(new CANNON.Vec3(100,12.5,25));
     wall.castShadow = true;
     scene.add( wall );
     boxBody = new CANNON.Body({ mass: 0 });
@@ -119,6 +119,33 @@ var createRoom3 = function (world, scene) {
     boxBody.position.set(positions[pos][0], positions[pos][1], positions[pos][2]);
     world.add(boxBody);
   }
+
+  // extra walls
+  // [-100, 85, 25]
+  geometry = new THREE.BoxGeometry( 150, 170, 1 );
+  wallTex.repeat.set(8, 8);
+  material = new THREE.MeshLambertMaterial( { map: wallTex } );
+
+  wall = new THREE.Mesh( geometry, material );
+  wall.position.set(-25, 85, 100);
+  boxShape = new CANNON.Box(new CANNON.Vec3(0.5,85,75));
+  wall.rotation.y = Math.PI/2;
+  wall.castShadow = true;
+  scene.add( wall );
+  boxBody = new CANNON.Body({ mass: 0 });
+  boxBody.addShape(boxShape);
+  boxBody.position.set(-25, 85, 100);
+  world.add(boxBody);
+
+  wall = new THREE.Mesh( geometry, material );
+  wall.position.set(-100, 85, 25);
+  boxShape = new CANNON.Box(new CANNON.Vec3(75,85,0.5));
+  wall.castShadow = true;
+  scene.add( wall );
+  boxBody = new CANNON.Body({ mass: 0 });
+  boxBody.addShape(boxShape);
+  boxBody.position.set(-100, 85, 25);
+  world.add(boxBody);
 
   // pillars
   var pillargeometry = new THREE.BoxGeometry( 10, 170, 10 );

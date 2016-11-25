@@ -6,8 +6,8 @@
  var PointerLockControls = function ( camera, player ) {
 
     var eyeYPos = 10;
-    var velocityFactor = 0.9;
-    var jumpVelocity = 80;
+    var velocityFactor = 1.5;
+    var jumpVelocity = 200;
     var scope = this;
 
     var pitchObject = new THREE.Object3D();
