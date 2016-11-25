@@ -97,7 +97,7 @@ var createRoom2 = function (world, scene) {
 
   var boxShape = new CANNON.Box(new CANNON.Vec3(5,20,20));
 
-  var wall = new Physijs.BoxMesh( geometry, material );
+  var wall = new THREE.Mesh( geometry, material );
   wall.position.set(-54.999, 20, 10);
   wall.castShadow = true;
   scene.add( wall );

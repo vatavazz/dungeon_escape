@@ -22,7 +22,7 @@ animate();
 function init() {
   initWorld();
   createScene();
-  createRoom3(world, scene);
+  createRoom2(world, scene);
 
   // renderer
   renderer = new THREE.WebGLRenderer();

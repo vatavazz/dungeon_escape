@@ -23,7 +23,7 @@ var createRoom1 = function (world, scene) {
 	var roofMat = new THREE.MeshLambertMaterial({ map: roofTex, side: THREE.DoubleSide});
 
   var roofGeo = new THREE.CylinderGeometry( 70, 70, 200, 32, 32, true, 0, 3.15 );
-  var roofMesh = new Physijs.ConeMesh( roofGeo, roofMat );
+  var roofMesh = new THREE.Mesh( roofGeo, roofMat );
   roofMesh.rotation.x = Math.PI/2;
   roofMesh.rotation.y = Math.PI/2;
   roofMesh.position.set(0,100,0);
@@ -94,7 +94,7 @@ var createRoom1 = function (world, scene) {
 
     var boxShape = new CANNON.Box(new CANNON.Vec3(5,20,20));
 
-    var wall = new Physijs.BoxMesh( geometry, material );
+    var wall = new THREE.Mesh( geometry, material );
     wall.position.set(30, 20, 80);
     wall.castShadow = true;
     scene.add( wall );
@@ -149,7 +149,7 @@ var createRoom1 = function (world, scene) {
     var positions = [55, 5, -45, -95];
     for (var i in positions) {
       // right side
-      pillar = new Physijs.BoxMesh( pillargeometry, pillarmaterial );
+      pillar = new THREE.Mesh( pillargeometry, pillarmaterial );
       pillar.position.set(30, 85, positions[i]);
       pillar.castShadow = true;
       scene.add( pillar );
@@ -168,7 +168,7 @@ var createRoom1 = function (world, scene) {
       scene.add( light );
 
       // left side
-      pillar = new Physijs.BoxMesh( pillargeometry, pillarmaterial );
+      pillar = new THREE.Mesh( pillargeometry, pillarmaterial );
       pillar.position.set(-30, 85, positions[i]);
       pillar.castShadow = true;
       scene.add( pillar );
