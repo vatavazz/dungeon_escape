@@ -3,7 +3,7 @@ var createRoom3 = function (world, scene) {
   var floorGeo = new THREE.PlaneGeometry(350, 350, 5, 5);
 	var floorTex = new THREE.TextureLoader().load('textures/bricks.png' );
 	floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
-	floorTex.repeat.set(8, 8);
+	floorTex.repeat.set(10, 10);
 	var floorMat = new THREE.MeshLambertMaterial({ map: floorTex, side: THREE.DoubleSide });
   var floorMesh = new THREE.Mesh(floorGeo, floorMat);
   floorMesh.rotation.x = Math.PI/2;
@@ -78,10 +78,20 @@ var createRoom3 = function (world, scene) {
   wallBody.position.set(-175, 0, 0);
   world.addBody(wallBody);
 
+  // FIXME collision
+  var curvegeometry = new THREE.CylinderGeometry( 175, 175, 170, 32, 2, true, Math.PI/2, Math.PI/2);
+  var curvematerial = new THREE.MeshLambertMaterial( { map: wallTex, side: THREE.DoubleSide  } );
+  var curveShape = new CANNON.Cylinder(22.5, 25, 2.5, 32);
+  var curve = new THREE.Mesh(curvegeometry, curvematerial);
+  curve.position.set(0, 85, 0);
+  scene.add(curve);
+
   // tombs
   var geometry = new THREE.BoxGeometry( 200, 15, 50 );
   var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
-  var material = new THREE.MeshLambertMaterial( { color: 0x88ff88 } );
+  wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+	wallTex.repeat.set(13.33, 1);
+  var material = new THREE.MeshLambertMaterial( { map: wallTex, color: "rgb(105, 122, 111)" } );
 
   var positions = [
     [0, 7.5, 75],
@@ -90,8 +100,8 @@ var createRoom3 = function (world, scene) {
     [-75, 7.5, 0],
     [-75, 7.5, -150],
 
-    [0, 87.5, 75],
-    [-75, 87.5, 0]
+    [0, 57.5, 75],
+    [-75, 57.5, 0]
   ];
   var wall;
   var boxBody, boxShape;
@@ -112,9 +122,13 @@ var createRoom3 = function (world, scene) {
 
   // pillars
   var pillargeometry = new THREE.BoxGeometry( 10, 170, 10 );
-  var pillarmaterial = new THREE.MeshLambertMaterial( { color: 0xff8888 } );
+  wallTex = new THREE.TextureLoader().load('textures/bricks.png');
+  wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+	wallTex.repeat.set(1, 17);
+  var pillarmaterial = new THREE.MeshLambertMaterial( { map:wallTex, color: "rgb(169, 177, 172)" } );
   var pillarShape = new CANNON.Box(new CANNON.Vec3(5,50,5));
 
+  // TODO torches
   var torch;
   var light;
 
@@ -159,6 +173,7 @@ var createRoom3 = function (world, scene) {
   altar = new THREE.Mesh(altargeometry, altarmaterial);
   altar.position.set(110, 2.5, -110);
   scene.add(altar);
+
   // FIXME wrong???
   // var altarBody = new CANNON.Body({ mass: 0 });
   // altarBody.addShape(altarShape);
@@ -178,4 +193,7 @@ var createRoom3 = function (world, scene) {
   light = new THREE.PointLight( "rgb(241, 148, 61)", 10, 80 );
   light.position.set( 85, 10, -85);
   scene.add( light );
+
+  // TODO doors (4)
+  // TODO enemies
 }
