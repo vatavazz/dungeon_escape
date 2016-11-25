@@ -15,6 +15,7 @@
     var yawObject = new THREE.Object3D();
     yawObject.position.y = 10;
 		yawObject.position.z = 85;
+		yawObject.position.x = 75;
     yawObject.add( pitchObject );
 
     var quat = new THREE.Quaternion();

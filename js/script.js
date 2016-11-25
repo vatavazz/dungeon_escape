@@ -1,8 +1,8 @@
-// TODO create more levels (2-3 more)
-// TODO ad object interaction
-// TODO shoot projectile
-// TODO torch puzzle
-// TODO bridge
+// TODO create more levels (2 more) == time consuming but ok
+// TODO add object interaction == hardest
+// TODO shoot projectile == already p much done
+// TODO torch puzzle == rafa
+// TODO door animation == should be easy
 
 var clock = new THREE.Clock();
 var scene, camera, renderer, world;
@@ -22,14 +22,14 @@ animate();
 function init() {
   initWorld();
   createScene();
-  createRoom1(world, scene);
+  createRoom3(world, scene);
 
   // renderer
   renderer = new THREE.WebGLRenderer();
   renderer.shadowMap.enabled = true;
   renderer.shadowMapSoft = true;
   renderer.setSize(window.innerWidth, window.innerHeight);
-  renderer.setClearColor("rgb(20, 20, 34)");
+  renderer.setClearColor("rgb(162, 162, 208)");
 
   document.body.appendChild(renderer.domElement);
   window.addEventListener( 'resize', onWindowResize, false );
@@ -42,7 +42,7 @@ function createScene() {
   var playerShape = new CANNON.Sphere( 10 );
   var player = new CANNON.Body({ mass: 5 });
   player.addShape(playerShape);
-  player.position.set(0, 10, 85);
+  player.position.set(75, 10, 85);
   player.linearDamping = 0.98;
   world.addBody(player);
 
