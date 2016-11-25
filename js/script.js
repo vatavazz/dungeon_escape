@@ -42,6 +42,7 @@ function createScene() {
   var playerShape = new CANNON.Sphere( 10 );
   var player = new CANNON.Body({ mass: 5 });
   player.addShape(playerShape);
+  // TODO fix player positioning
   player.position.set(75, 10, 85);
   player.linearDamping = 0.98;
   world.addBody(player);

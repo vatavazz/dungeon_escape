@@ -2,6 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  * edited by vatavazz
  */
+ // TODO fix player positioning
  var PointerLockControls = function ( camera, player ) {
 
     var eyeYPos = 10;
