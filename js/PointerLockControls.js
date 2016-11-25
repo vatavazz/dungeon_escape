@@ -3,8 +3,7 @@
  * edited by vatavazz
  */
  // TODO fix player positioning
- var PointerLockControls = function ( camera, player ) {
-
+ var PointerLockControls = function ( camera, player, x, y, z, change ) {
     var eyeYPos = 10;
     var velocityFactor = 1.5;
     var jumpVelocity = 200;
@@ -14,9 +13,9 @@
     pitchObject.add( camera );
 
     var yawObject = new THREE.Object3D();
-    yawObject.position.y = 10;
-		yawObject.position.z = 85;
-		yawObject.position.x = 75;
+    yawObject.position.x = x;
+		yawObject.position.y = y;
+		yawObject.position.z = z;
     yawObject.add( pitchObject );
 
     var quat = new THREE.Quaternion();
@@ -103,6 +102,7 @@
     document.addEventListener( 'keyup', onKeyUp, false );
 
     this.enabled = false;
+    if (change) this.enabled = true;
 
     this.getObject = function () { return yawObject; };
 

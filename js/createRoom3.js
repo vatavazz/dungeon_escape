@@ -1,4 +1,43 @@
-var createRoom3 = function (world, scene) {
+var createRoom3 = function () {
+  scene = new THREE.Scene;
+  world = new CANNON.World();
+  world.quatNormalizeSkip = 0;
+  world.quatNormalizeFast = false;
+
+  var solver = new CANNON.GSSolver();
+
+  world.defaultContactMaterial.contactEquationStiffness = 1e9;
+  world.defaultContactMaterial.contactEquationRelaxation = 4;
+
+  solver.iterations = 7;
+  solver.tolerance = 0.1;
+  world.solver = new CANNON.SplitSolver(solver);
+
+  world.gravity.set(0,-200,0);
+  world.broadphase = new CANNON.NaiveBroadphase();
+
+  var physicsMaterial = new CANNON.Material( "slipperyMaterial" );
+  var physicsContactMaterial = new CANNON.ContactMaterial( physicsMaterial, physicsMaterial, 0.0, 0.3 );
+  world.addContactMaterial(physicsContactMaterial);
+
+  // player object
+  var playerShape = new CANNON.Sphere( 10 );
+  var player = new CANNON.Body({ mass: 5 });
+  player.addShape(playerShape);
+  // TODO fix player positioning if entered from secret passage
+  player.position.set(75, 10, 150);
+  player.linearDamping = 0.98;
+  world.addBody(player);
+
+  var ambientLight = new THREE.AmbientLight( "rgb(48, 48, 61)" );
+  scene.add( ambientLight );
+
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+	scene.add(camera);
+
+  controls = new PointerLockControls( camera , player, 75, 10, 150, true );
+  scene.add( controls.getObject() );
+
   // floor
   var floorGeo = new THREE.PlaneGeometry(350, 350, 5, 5);
 	var floorTex = new THREE.TextureLoader().load('textures/bricks.png' );

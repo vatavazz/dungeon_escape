@@ -1,4 +1,43 @@
-var createRoom1 = function (world, scene) {
+var createRoom1 = function () {
+  scene = new THREE.Scene;
+  world = new CANNON.World();
+  world.quatNormalizeSkip = 0;
+  world.quatNormalizeFast = false;
+
+  var solver = new CANNON.GSSolver();
+
+  world.defaultContactMaterial.contactEquationStiffness = 1e9;
+  world.defaultContactMaterial.contactEquationRelaxation = 4;
+
+  solver.iterations = 7;
+  solver.tolerance = 0.1;
+  world.solver = new CANNON.SplitSolver(solver);
+
+  world.gravity.set(0,-200,0);
+  world.broadphase = new CANNON.NaiveBroadphase();
+
+  var physicsMaterial = new CANNON.Material( "slipperyMaterial" );
+  var physicsContactMaterial = new CANNON.ContactMaterial( physicsMaterial, physicsMaterial, 0.0, 0.3 );
+  world.addContactMaterial(physicsContactMaterial);
+
+  // player object
+  var playerShape = new CANNON.Sphere( 10 );
+  var player = new CANNON.Body({ mass: 5 });
+  player.addShape(playerShape);
+  // TODO fix player positioning
+  player.position.set(0, 10, 85);
+  player.linearDamping = 0.98;
+  world.addBody(player);
+
+  var ambientLight = new THREE.AmbientLight( "rgb(48, 48, 61)" );
+  scene.add( ambientLight );
+
+  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
+	scene.add(camera);
+
+  controls = new PointerLockControls( camera , player, 0, 10, 85, false );
+  scene.add( controls.getObject() );
+
   // floor
   var floorGeo = new THREE.PlaneGeometry(140, 200, 5, 5);
 	var floorTex = new THREE.TextureLoader().load('textures/bricks.png' );
@@ -123,11 +162,13 @@ var createRoom1 = function (world, scene) {
 
     halfExtents = new CANNON.Vec3(20,20,5);
     boxShape = new CANNON.Box(halfExtents);
-    boxBody = new CANNON.Body({ mass: 0 });
-    boxBody.addShape(boxShape);
-    boxBody.position.set(0, 20, -95);
-    boxBody.name = "levelEnd";
-    world.add(boxBody)
+    var levelEnd = new CANNON.Body({ mass: 0 });
+    levelEnd.addShape(boxShape);
+    levelEnd.position.set(0, 20, -95);
+    levelEnd.name = "levelEnd";
+    world.add(levelEnd)
+
+    levelEnd.addEventListener("collide",function(e){createRoom2();});
   }
   function createPillars() {
     // pillar info

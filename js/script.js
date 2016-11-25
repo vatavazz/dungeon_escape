@@ -21,8 +21,9 @@ animate();
 
 function init() {
   initWorld();
-  createScene();
-  createRoom2(world, scene);
+  scene = new THREE.Scene;
+  createRoom1();
+
 
   // renderer
   renderer = new THREE.WebGLRenderer();
@@ -33,28 +34,6 @@ function init() {
 
   document.body.appendChild(renderer.domElement);
   window.addEventListener( 'resize', onWindowResize, false );
-}
-
-function createScene() {
-  scene = new THREE.Scene;
-
-  // player object
-  var playerShape = new CANNON.Sphere( 10 );
-  var player = new CANNON.Body({ mass: 5 });
-  player.addShape(playerShape);
-  // TODO fix player positioning
-  player.position.set(75, 10, 85);
-  player.linearDamping = 0.98;
-  world.addBody(player);
-
-  var ambientLight = new THREE.AmbientLight( "rgb(48, 48, 61)" );
-  scene.add( ambientLight );
-
-  camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
-	scene.add(camera);
-
-  controls = new PointerLockControls( camera , player );
-  scene.add( controls.getObject() );
 }
 
 function initWorld() {
@@ -127,21 +106,3 @@ function onWindowResize() {
   camera.updateProjectionMatrix();
   renderer.setSize( window.innerWidth, window.innerHeight );
 }
-
-//     player.addEventListener("collide",function(e){
-//       if (e.body.name == "levelEnd") {
-//         console.log("next level!");
-//         lvl++;
-//         switch (lvl) {
-//           case 2:
-//             createRoom2(world, scene);
-//             break;
-//           case 3:
-//             createRoom3(world, scene);
-//             break;
-//         }
-//         // destroy scene, destroy world
-//         initWorld();
-//         createScene();
-//       }
-// });
