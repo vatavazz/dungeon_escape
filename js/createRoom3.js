@@ -9,7 +9,6 @@ var createRoom3 = function (world, scene) {
   floorMesh.rotation.x = Math.PI/2;
   floorMesh.receiveShadow = true;
   scene.add(floorMesh);
-
   var groundShape = new CANNON.Plane();
   var groundBody = new CANNON.Body({ mass: 0 });
   groundBody.addShape(groundShape);
@@ -28,7 +27,7 @@ var createRoom3 = function (world, scene) {
   // roofMesh.rotation.y = Math.PI/2;
   // roofMesh.position.set(0,100,0);
   // scene.add( roofMesh );
-  //
+
   // walls
   var wallGeo = new THREE.PlaneGeometry(350, 170, 5, 5);
 	var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
@@ -40,7 +39,6 @@ var createRoom3 = function (world, scene) {
   wallMesh.position.set(0, 85, 175);
   wallMesh.receiveShadow = true;
   scene.add(wallMesh);
-
   var wallShape = new CANNON.Plane();
   var wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
@@ -52,7 +50,6 @@ var createRoom3 = function (world, scene) {
   wallMesh.position.set(0, 85, -175);
   wallMesh.receiveShadow = true;
   scene.add(wallMesh);
-
   wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.position.set(0, 0, -175);
@@ -65,7 +62,6 @@ var createRoom3 = function (world, scene) {
   wallMesh.position.set(175, 85, 0);
   wallMesh.receiveShadow = true;
   scene.add(wallMesh);
-
   wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0),-Math.PI/2);
@@ -76,7 +72,6 @@ var createRoom3 = function (world, scene) {
   wallMesh.position.set(-175, 85, 0);
   wallMesh.receiveShadow = true;
   scene.add(wallMesh);
-
   wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0),Math.PI/2);
@@ -84,79 +79,65 @@ var createRoom3 = function (world, scene) {
   world.addBody(wallBody);
 
   // tombs
-  var geometry = new THREE.BoxGeometry( 200, 25, 50 );
+  var geometry = new THREE.BoxGeometry( 200, 15, 50 );
   var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
   var material = new THREE.MeshLambertMaterial( { color: 0x88ff88 } );
 
-  var boxShape = new CANNON.Box(new CANNON.Vec3(25,12.5,100));
+  var positions = [
+    [0, 7.5, 75],
+    [150, 7.5, 75],
 
-  var wall = new THREE.Mesh( geometry, material );
-  wall.position.set(150, 12.5, 75);
-  wall.rotation.y = Math.PI/2;
-  wall.castShadow = true;
-  scene.add( wall );
-  var boxBody = new CANNON.Body({ mass: 0 });
-  boxBody.addShape(boxShape);
-  boxBody.position.set(150, 12.5, 75);
-  console.log(boxBody);
-  world.add(boxBody);
+    [-75, 7.5, 0],
+    [-75, 7.5, -150],
 
-  wall = new THREE.Mesh( geometry, material );
-  wall.position.set(0, 12.5, 75);
-  wall.rotation.y = Math.PI/2;
-  wall.castShadow = true;
-  scene.add( wall );
-  boxBody = new CANNON.Body({ mass: 0 });
-  boxBody.addShape(boxShape);
-  boxBody.position.set(0, 12.5, 75);
-  world.add(boxBody);
-
-  boxShape = new CANNON.Box(new CANNON.Vec3(100,12.5,15));
-
-  wall = new THREE.Mesh( geometry, material );
-  wall.position.set(-75, 12.5, 0);
-  wall.castShadow = true;
-  scene.add( wall );
-  boxBody = new CANNON.Body({ mass: 0 });
-  boxBody.addShape(boxShape);
-  boxBody.position.set(-75, 12.5, 0);
-  world.add(boxBody);
-
-  wall = new THREE.Mesh( geometry, material );
-  wall.position.set(-75, 12.5, -150);
-  wall.castShadow = true;
-  scene.add( wall );
-  boxBody = new CANNON.Body({ mass: 0 });
-  boxBody.addShape(boxShape);
-  boxBody.position.set(-75, 12.5, -150);
-  world.add(boxBody);
+    [0, 87.5, 75],
+    [-75, 87.5, 0]
+  ];
+  var wall;
+  var boxBody, boxShape;
+  for (var pos in positions) {
+    wall = new THREE.Mesh( geometry, material );
+    wall.position.set(positions[pos][0], positions[pos][1], positions[pos][2]);
+    if (positions[pos][2] == 75) {
+      boxShape = new CANNON.Box(new CANNON.Vec3(25,12.5,100));
+      wall.rotation.y = Math.PI/2;
+    } else boxShape = new CANNON.Box(new CANNON.Vec3(100,12.5,15));
+    wall.castShadow = true;
+    scene.add( wall );
+    boxBody = new CANNON.Body({ mass: 0 });
+    boxBody.addShape(boxShape);
+    boxBody.position.set(positions[pos][0], positions[pos][1], positions[pos][2]);
+    world.add(boxBody);
+  }
 
   // pillars
-  var pillar;
-  var pillarBody;
-  var pillargeometry = new THREE.BoxGeometry( 10, 100, 10 );
+  var pillargeometry = new THREE.BoxGeometry( 10, 170, 10 );
   var pillarmaterial = new THREE.MeshLambertMaterial( { color: 0xff8888 } );
   var pillarShape = new CANNON.Box(new CANNON.Vec3(5,50,5));
 
+  var torch;
+  var light;
+
   var positions = [
-    [30, 50, 170],
-    [30, 50, 75],
-    [30, 50, -20],
-    [120, 50, 170],
-    [120, 50, 74],
-    [120, 50, -20],
+    [30, 85, 170],
+    [30, 85, 75],
+    [30, 85, -20],
+    [120, 85, 170],
+    [120, 85, 74],
+    [120, 85, -20],
 
-    [-170, 50, -30],
-    [-75, 50, -30],
-    [20, 50, -30],
-    [-170, 50, -120],
-    [-75, 50, -120],
-    [20, 50, -120],
+    [-170, 85, -30],
+    [-75, 85, -30],
+    [20, 85, -30],
+    [-170, 85, -120],
+    [-75, 85, -120],
+    [20, 85, -120],
 
-    [30, 50, -30],
-    [110, 50, -110]
+    [30, 85, -30],
+    [110, 85, -110]
   ];
-
+  var pillar;
+  var pillarBody;
   for (var pos in positions) {
     pillar = new THREE.Mesh( pillargeometry, pillarmaterial );
     pillar.position.set(positions[pos][0], positions[pos][1], positions[pos][2]);
@@ -168,73 +149,33 @@ var createRoom3 = function (world, scene) {
     world.add(pillarBody);
   }
 
+  // altar
+  var altar;
+  var altarBody;
+  var altargeometry = new THREE.CylinderGeometry( 45, 50, 5, 32 );
+  var altarmaterial = new THREE.MeshLambertMaterial( { color: 0x8888ff } );
+  var altarShape = new CANNON.Cylinder(22.5, 25, 2.5, 32);
 
+  altar = new THREE.Mesh(altargeometry, altarmaterial);
+  altar.position.set(110, 2.5, -110);
+  scene.add(altar);
+  // FIXME wrong???
+  // var altarBody = new CANNON.Body({ mass: 0 });
+  // altarBody.addShape(altarShape);
+  // altarBody.position.set(110, 2.5, -110);
+  // world.add(altarBody);
 
-  // function createPillars() {
-  //   // pillar info
-  //   var pillar;
-  //   var pillarBody;
-  //   var pillargeometry = new THREE.BoxGeometry( 10, 170, 10 );
-  //   var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
-  //     wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
-  // 	  wallTex.repeat.set(0.5, 4);
-  //   var pillarmaterial = new THREE.MeshLambertMaterial( { map: wallTex } );
-  //   var pillarShape = new CANNON.Box(new CANNON.Vec3(5,85,5));
-  //
-  //   // torch info
-  //   var torch;
-    var light;
-  //   var torchgeometry = new THREE.SphereGeometry( 1, 16, 16 );
-  //   var torchmaterial = new THREE.MeshBasicMaterial( { color: "rgb(241, 148, 61)" } );
-  //
-  //   var positions = [55, 5, -45, -95];
-  //   for (var i in positions) {
-  //     // right side
-  //     pillar = new Physijs.BoxMesh( pillargeometry, pillarmaterial );
-  //     pillar.position.set(30, 85, positions[i]);
-  //     pillar.castShadow = true;
-  //     scene.add( pillar );
-  //
-  //     pillarBody = new CANNON.Body({ mass: 0 });
-  //     pillarBody.addShape(pillarShape);
-  //     pillarBody.position.set(30, 85, positions[i]);
-  //     world.add(pillarBody)
-  //
-  //     torch = new THREE.Mesh( torchgeometry, torchmaterial );
-  //     torch.position.set(25, 25, positions[i]);
-  //     scene.add( torch );
-  //
-      light = new THREE.PointLight( "rgb(241, 148, 61)", 10, 80 );
-      light.position.set( -85, 10, -85);
-      scene.add( light );
-      light = new THREE.PointLight( "rgb(241, 148, 61)", 10, 80 );
-      light.position.set( 85, 10, 85);
-      scene.add( light );
-      light = new THREE.PointLight( "rgb(241, 148, 61)", 10, 80 );
-      light.position.set( -85, 10, 85);
-      scene.add( light );
-      light = new THREE.PointLight( "rgb(241, 148, 61)", 10, 80 );
-      light.position.set( 85, 10, -85);
-      scene.add( light );
-  //
-  //     // left side
-  //     pillar = new Physijs.BoxMesh( pillargeometry, pillarmaterial );
-  //     pillar.position.set(-30, 85, positions[i]);
-  //     pillar.castShadow = true;
-  //     scene.add( pillar );
-  //
-  //     pillarBody = new CANNON.Body({ mass: 0 });
-  //     pillarBody.addShape(pillarShape);
-  //     pillarBody.position.set(-30, 85, positions[i]);
-  //     world.add(pillarBody)
-  //
-  //     torch = new THREE.Mesh( torchgeometry, torchmaterial );
-  //     torch.position.set( -25, 25, positions[i] );
-  //     scene.add( torch );
-  //
-  //     light = new THREE.PointLight( "rgb(241, 148, 61)", 0.4-i/4, 80 );
-  //     light.position.set( -25, 25, positions[i] );
-  //     scene.add( light );
-    // }
-  // }
+  // temporary lights
+  light = new THREE.PointLight( "rgb(241, 148, 61)", 10, 80 );
+  light.position.set( -85, 10, -85);
+  scene.add( light );
+  light = new THREE.PointLight( "rgb(241, 148, 61)", 10, 80 );
+  light.position.set( 85, 10, 85);
+  scene.add( light );
+  light = new THREE.PointLight( "rgb(241, 148, 61)", 10, 80 );
+  light.position.set( -85, 10, 85);
+  scene.add( light );
+  light = new THREE.PointLight( "rgb(241, 148, 61)", 10, 80 );
+  light.position.set( 85, 10, -85);
+  scene.add( light );
 }
