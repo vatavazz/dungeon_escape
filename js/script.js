@@ -66,7 +66,7 @@ function animate() {
   renderer.render( scene, camera );
   time = Date.now();
 }
-
+var container = document.getElementById( 'container' );
 function initPointerLock() {
   var element = document.body;
   if (pLockEnabled) {
@@ -75,7 +75,14 @@ function initPointerLock() {
           document.mozPointerLockElement === element ||
           document.webkitPointerLockElement === element) {
         controls.enabled = true;
-      } else controls.enabled = false;
+        console.log("enabled");
+        container.style.display = 'none';
+      } else {
+        controls.enabled = false;
+        container.style.display = '-webkit-box';
+        container.style.display = '-moz-box';
+        container.style.display = 'box';
+      }
     };
 
     var pointerlockerror = function (event) {
