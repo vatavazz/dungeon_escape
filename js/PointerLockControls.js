@@ -20,6 +20,7 @@
     yawObject.add( pitchObject );
 
     var quat = new THREE.Quaternion();
+    var iQuat = new THREE.Quaternion();
 
     var moveForward = false;
     var moveBackward = false;
@@ -141,8 +142,6 @@
 
 			inputVelocity.set(0,0,0);
 
-      // get rid of momentum - its a bit choppy
-      if (!moveForward && !moveBackward && !moveLeft && !moveRight) velocity.set(0,velocity.y,0);
 
 			// FIXME no ammortisation
 			if ( moveForward ) inputVelocity.z = -velocityFactor * delta;
@@ -153,13 +152,24 @@
 			euler.x = pitchObject.rotation.x;
 			euler.y = yawObject.rotation.y;
 			euler.order = "XYZ";
-      // get rid of gimble lock
 			quat.setFromEuler(euler);
+
+      iQuat.copy(quat);
+      iQuat.inverse();
+      var tempVel = new THREE.Vector3();
 
 			inputVelocity.applyQuaternion(quat);
 
 			velocity.x += inputVelocity.x;
 			velocity.z += inputVelocity.z;
+
+      // get rid of momentum after stopping
+      tempVel.copy(velocity);
+      tempVel.applyQuaternion(iQuat);
+      if (!moveForward && !moveBackward) tempVel.z = 0;
+      if (!moveLeft && !moveRight) tempVel.x = 0;
+      tempVel.applyQuaternion(quat);
+      velocity.set(tempVel.x, velocity.y, tempVel.z);
 
 			yawObject.position.copy(player.position);
       yawObject.position.y+=10;
