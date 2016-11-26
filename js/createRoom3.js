@@ -31,6 +31,7 @@ var createRoom3 = function (secret) {
 
   player.position.set(x, y, z);
   player.linearDamping = 0.98;
+  player.name = 'player';
   world.addBody(player);
 
   var ambientLight = new THREE.AmbientLight( "rgb(48, 48, 61)" );
@@ -130,7 +131,7 @@ var createRoom3 = function (secret) {
   boxBody.position.set(75, 20, 175);
   boxBody.name = "levelEnd";
   world.add(boxBody)
-  boxBody.addEventListener("collide",function(e){createRoom2(false);});
+  boxBody.addEventListener("collide",function(e){if (e.body.name == 'player')createRoom2(false);});
 
   wall = new THREE.Mesh( geometry, material );
   wall.rotation.y = Math.PI/2;
@@ -142,7 +143,7 @@ var createRoom3 = function (secret) {
   boxBody.position.set(0, 95, 175);
   boxBody.name = "levelEnd";
   world.add(boxBody)
-  boxBody.addEventListener("collide",function(e){createRoom2(true);});
+  boxBody.addEventListener("collide",function(e){if (e.body.name == 'player') createRoom2(true);});
 
   // FIXME collision
   var curvegeometry = new THREE.CylinderGeometry( 175, 175, 170, 32, 2, true, Math.PI/2, Math.PI/2);

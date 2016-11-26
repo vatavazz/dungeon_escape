@@ -28,6 +28,7 @@ var createRoom2 = function (start) {
   else var x = 0, y = 10, z = -125;
   player.position.set(x, y, z);
   player.linearDamping = 0.98;
+  player.name = 'player';
   world.addBody(player);
 
   var ambientLight = new THREE.AmbientLight( "rgb(48, 48, 61)" );
@@ -144,7 +145,7 @@ var createRoom2 = function (start) {
   boxBody.addShape(boxShape);
   boxBody.position.set(-54, 20, 10);
   world.add(boxBody)
-  boxBody.addEventListener("collide",function(e){createRoom3(true);});
+  boxBody.addEventListener("collide",function(e){if (e.body.name == 'player') createRoom3(true);});
 
   material = new THREE.MeshLambertMaterial( {color: "rgb(177, 177, 177)", map: wallTex } );
   boxShape = new CANNON.Box(new CANNON.Vec3(20,20,5));
@@ -159,7 +160,7 @@ var createRoom2 = function (start) {
   boxBody.position.set(0, 20, -150);
   boxBody.name = "levelEnd";
   world.add(boxBody)
-  boxBody.addEventListener("collide",function(e){createRoom3(false);});
+  boxBody.addEventListener("collide",function(e){if (e.body.name == 'player') createRoom3(false);});
 
   // door back
   wall = new THREE.Mesh( geometry, material );
@@ -172,5 +173,5 @@ var createRoom2 = function (start) {
   boxBody.position.set(0, 20, 150);
   boxBody.name = "levelEnd";
   world.add(boxBody)
-  boxBody.addEventListener("collide",function(e){createRoom1(false);});
+  boxBody.addEventListener("collide",function(e){if (e.body.name == 'player') createRoom1(false);});
 }

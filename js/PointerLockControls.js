@@ -29,13 +29,12 @@
 
     var contactNormal = new CANNON.Vec3();
     var upAxis = new CANNON.Vec3(0,1,0);
-    // FIXME was > 0.5 before, idk what the fuck i did but it works
+    // FIXME was > 0.5, now jumping upon collision possible
     player.addEventListener("collide",function(e){
         var contact = e.contact;
         if (contact.bi.id == player.id) contact.ni.negate(contactNormal);
         else contactNormal.copy(contact.ni);
 				if (contactNormal.dot(upAxis) >= 0) canJump = true;
-        console.log(contact);
     });
 
     var velocity = player.velocity;

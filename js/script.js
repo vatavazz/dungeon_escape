@@ -1,8 +1,6 @@
-// TODO create more levels (2 more) == time consuming but ok
-// TODO add object interaction == hardest
-// TODO shoot projectile == already p much done
-// TODO torch puzzle == rafa
-// TODO door animation == should be easy
+// TODO secret corridor
+// TODO integrate torch puzzle
+// TODO skeleton fight
 
 var clock = new THREE.Clock();
 var scene, camera, renderer, world;
@@ -12,8 +10,8 @@ var pLockEnabled = 'pointerLockElement' in document || 'mozPointerLockElement' i
 var controls;
 var footstep = new Audio('sfx/step.wav');
 var time = Date.now();
-
-var lvl = 1;
+var ai;
+var ais = [];
 
 initPointerLock();
 init();
@@ -33,6 +31,12 @@ function init() {
 
   document.body.appendChild(renderer.domElement);
   window.addEventListener( 'resize', onWindowResize, false );
+
+  ai = new skeleton(0, 0);
+  ais.push(ai);
+  ai = new skeleton(10, 10);
+  ais.push(ai);
+
 }
 
 function initWorld() {
@@ -62,6 +66,8 @@ function animate() {
   requestAnimationFrame(animate);
   if (controls.enabled) world.step(dt);
   controls.update( Date.now() - time );
+  for (var i in ais)
+    ais[i].update(Date.now() - time);
   renderer.render( scene, camera );
   time = Date.now();
 }

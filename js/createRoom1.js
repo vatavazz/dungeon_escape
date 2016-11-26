@@ -29,6 +29,7 @@ var createRoom1 = function (start) {
   else var x = 0, y = 10, z = -75;
   player.position.set(x, y, z);
   player.linearDamping = 0.98;
+  player.name = 'player';
   world.addBody(player);
 
   var ambientLight = new THREE.AmbientLight( "rgb(48, 48, 61)" );
@@ -40,6 +41,8 @@ var createRoom1 = function (start) {
   if (start) controls = new PointerLockControls( camera , player, x, y, z, false );
   else controls = new PointerLockControls( camera , player, x, y, z, true );
   scene.add( controls.getObject() );
+
+
 
   // floor
   var floorGeo = new THREE.PlaneGeometry(140, 200, 5, 5);
@@ -170,7 +173,7 @@ var createRoom1 = function (start) {
     levelEnd.name = "levelEnd";
     world.add(levelEnd)
 
-    levelEnd.addEventListener("collide",function(e){createRoom2(true);});
+    levelEnd.addEventListener("collide",function(e){if (e.body.name == 'player') createRoom2(true);});
   }
   function createPillars() {
     // pillar info
