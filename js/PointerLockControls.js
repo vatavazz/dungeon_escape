@@ -166,8 +166,8 @@
       // get rid of momentum after stopping
       tempVel.copy(velocity);
       tempVel.applyQuaternion(iQuat);
-      if (!moveForward && !moveBackward) tempVel.z = 0;
-      if (!moveLeft && !moveRight) tempVel.x = 0;
+      if (!moveForward && !moveBackward && canJump) tempVel.z = 0;
+      if (!moveLeft && !moveRight && canJump) tempVel.x = 0;
       tempVel.applyQuaternion(quat);
       velocity.set(tempVel.x, velocity.y, tempVel.z);
 
