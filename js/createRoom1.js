@@ -13,16 +13,16 @@ var createRoom1 = function (start) {
   solver.tolerance = 0.1;
   world.solver = new CANNON.SplitSolver(solver);
 
-  world.gravity.set(0,-80,0);
+  world.gravity.set(0,-100,0);
   world.broadphase = new CANNON.NaiveBroadphase();
 
   var physicsMaterial = new CANNON.Material( "slipperyMaterial" );
-  var physicsContactMaterial = new CANNON.ContactMaterial( physicsMaterial, physicsMaterial, 0.0, 0.3 );
+  var physicsContactMaterial = new CANNON.ContactMaterial( physicsMaterial, physicsMaterial, 0.0, 0.0 );
   world.addContactMaterial(physicsContactMaterial);
 
   // player object
   var playerShape = new CANNON.Sphere( 10 );
-  var player = new CANNON.Body({ mass: 5 });
+  var player = new CANNON.Body({ mass: 5});
   player.addShape(playerShape);
   if (start) var x = 0, y = 10, z = 85;
   else var x = 0, y = 10, z = -75;
