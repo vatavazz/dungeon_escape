@@ -1,4 +1,4 @@
-var createRoom2 = function () {
+var createRoom2 = function (start) {
   scene = new THREE.Scene;
   world = new CANNON.World();
   world.quatNormalizeSkip = 0;
@@ -24,8 +24,9 @@ var createRoom2 = function () {
   var playerShape = new CANNON.Sphere( 10 );
   var player = new CANNON.Body({ mass: 5 });
   player.addShape(playerShape);
-  // TODO fix player positioning if entered from secret passage
-  player.position.set(0, 10, 125);
+  if (start) var x = 0, y = 10, z = 125;
+  else var x = 0, y = 10, z = -125;
+  player.position.set(x, y, z);
   player.linearDamping = 0.98;
   world.addBody(player);
 
@@ -35,7 +36,7 @@ var createRoom2 = function () {
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
 	scene.add(camera);
 
-  controls = new PointerLockControls( camera , player, 0, 10, 125, true );
+  controls = new PointerLockControls( camera , player, x, y, z, true );
   scene.add( controls.getObject() );
 
   // floor
@@ -121,7 +122,6 @@ var createRoom2 = function () {
   var torchmaterial = new THREE.MeshBasicMaterial( { color: "rgb(241, 148, 61)" } );
   var positions = [35, -15];
   for (var i in positions) {
-
     light = new THREE.PointLight( "rgb(241, 148, 61)", 0.4, 80 );
     light.position.set( -40, 25, positions[i] );
     scene.add( light );
@@ -140,24 +140,37 @@ var createRoom2 = function () {
   wall.position.set(-54.999, 20, 10);
   wall.castShadow = true;
   scene.add( wall );
-
   var boxBody = new CANNON.Body({ mass: 0 });
   boxBody.addShape(boxShape);
-  boxBody.position.set(-60, 20, 10);
+  boxBody.position.set(-54, 20, 10);
   world.add(boxBody)
+  boxBody.addEventListener("collide",function(e){createRoom3(true);});
 
   material = new THREE.MeshLambertMaterial( {color: "rgb(177, 177, 177)", map: wallTex } );
+  boxShape = new CANNON.Box(new CANNON.Vec3(20,20,5));
+
   wall = new THREE.Mesh( geometry, material );
   wall.rotation.y = Math.PI/2;
   wall.position.set(0, 20, -150);
   wall.castShadow = true;
   scene.add( wall );
-
-  boxShape = new CANNON.Box(new CANNON.Vec3(20,20,5));
   boxBody = new CANNON.Body({ mass: 0 });
   boxBody.addShape(boxShape);
   boxBody.position.set(0, 20, -150);
   boxBody.name = "levelEnd";
   world.add(boxBody)
-  boxBody.addEventListener("collide",function(e){createRoom3();});
+  boxBody.addEventListener("collide",function(e){createRoom3(false);});
+
+  // door back
+  wall = new THREE.Mesh( geometry, material );
+  wall.rotation.y = Math.PI/2;
+  wall.position.set(0, 20, 150);
+  wall.castShadow = true;
+  scene.add( wall );
+  boxBody = new CANNON.Body({ mass: 0 });
+  boxBody.addShape(boxShape);
+  boxBody.position.set(0, 20, 150);
+  boxBody.name = "levelEnd";
+  world.add(boxBody)
+  boxBody.addEventListener("collide",function(e){createRoom1(false);});
 }

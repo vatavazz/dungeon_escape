@@ -22,8 +22,7 @@ animate();
 function init() {
   initWorld();
   scene = new THREE.Scene;
-  createRoom1();
-
+  createRoom1(true);
 
   // renderer
   renderer = new THREE.WebGLRenderer();

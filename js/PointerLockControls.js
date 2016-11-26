@@ -2,7 +2,7 @@
  * @author mrdoob / http://mrdoob.com/
  * edited by vatavazz
  */
- // TODO fix player positioning
+ // pass the camera, the player object, the x y and z position of the controls, and lvl > 1
  var PointerLockControls = function ( camera, player, x, y, z, change ) {
     var eyeYPos = 10;
     var velocityFactor = 1.5;
@@ -29,11 +29,13 @@
 
     var contactNormal = new CANNON.Vec3();
     var upAxis = new CANNON.Vec3(0,1,0);
+    // FIXME was > 0.5 before, idk what the fuck i did but it works
     player.addEventListener("collide",function(e){
         var contact = e.contact;
         if (contact.bi.id == player.id) contact.ni.negate(contactNormal);
         else contactNormal.copy(contact.ni);
-				if (contactNormal.dot(upAxis) > 0.5) canJump = true;
+				if (contactNormal.dot(upAxis) >= 0) canJump = true;
+        console.log(contact);
     });
 
     var velocity = player.velocity;

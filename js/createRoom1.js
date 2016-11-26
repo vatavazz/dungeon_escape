@@ -1,4 +1,4 @@
-var createRoom1 = function () {
+var createRoom1 = function (start) {
   scene = new THREE.Scene;
   world = new CANNON.World();
   world.quatNormalizeSkip = 0;
@@ -25,7 +25,9 @@ var createRoom1 = function () {
   var player = new CANNON.Body({ mass: 5 });
   player.addShape(playerShape);
   // TODO fix player positioning
-  player.position.set(0, 10, 85);
+  if (start) var x = 0, y = 10, z = 85;
+  else var x = 0, y = 10, z = -75;
+  player.position.set(x, y, z);
   player.linearDamping = 0.98;
   world.addBody(player);
 
@@ -35,7 +37,8 @@ var createRoom1 = function () {
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
 	scene.add(camera);
 
-  controls = new PointerLockControls( camera , player, 0, 10, 85, false );
+  if (start) controls = new PointerLockControls( camera , player, x, y, z, false );
+  else controls = new PointerLockControls( camera , player, x, y, z, true );
   scene.add( controls.getObject() );
 
   // floor
@@ -125,7 +128,6 @@ var createRoom1 = function () {
   createWall();
   createPillars();
 
-
   function createWall() {
     var geometry = new THREE.BoxGeometry( 10, 40, 40 );
     var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
@@ -168,7 +170,7 @@ var createRoom1 = function () {
     levelEnd.name = "levelEnd";
     world.add(levelEnd)
 
-    levelEnd.addEventListener("collide",function(e){createRoom2();});
+    levelEnd.addEventListener("collide",function(e){createRoom2(true);});
   }
   function createPillars() {
     // pillar info
