@@ -122,7 +122,7 @@ var createRoom2 = function (start) {
   var torchgeometry = new THREE.SphereGeometry( 1, 16, 16 );
   var torchmaterial = new THREE.MeshBasicMaterial( { color: "rgb(241, 148, 61)" } );
   var positions = [35, -15];
-  for (var i in positions) {
+  for (var i = 0; i<positions.length; i++) {
     light = new THREE.PointLight( "rgb(241, 148, 61)", 0.4, 80 );
     light.position.set( -40, 25, positions[i] );
     scene.add( light );

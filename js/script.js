@@ -10,7 +10,6 @@ var pLockEnabled = 'pointerLockElement' in document || 'mozPointerLockElement' i
 var controls;
 var footstep = new Audio('sfx/step.wav');
 var time = Date.now();
-var ai;
 var ais = [];
 
 initPointerLock();
@@ -31,12 +30,6 @@ function init() {
 
   document.body.appendChild(renderer.domElement);
   window.addEventListener( 'resize', onWindowResize, false );
-
-  ai = new skeleton(0, 0);
-  ais.push(ai);
-  ai = new skeleton(10, 10);
-  ais.push(ai);
-
 }
 
 function initWorld() {
@@ -66,8 +59,10 @@ function animate() {
   requestAnimationFrame(animate);
   if (controls.enabled) world.step(dt);
   controls.update( Date.now() - time );
-  for (var i in ais)
+  for (var i = 0; i < ais.length; i++) {
     ais[i].update(Date.now() - time);
+  }
+  // createRoom3.update( Date.now() - time );
   renderer.render( scene, camera );
   time = Date.now();
 }

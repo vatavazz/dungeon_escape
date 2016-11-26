@@ -1,24 +1,25 @@
-var skeleton = function (x, z) {
+var skeleton = function (x, y, z) {
   var scope = this;
 
   var skeletonShape = new CANNON.Sphere( 5 );
   var geometry = new THREE.SphereGeometry( 5, 32, 32 );
   var material = new THREE.MeshBasicMaterial( {color: 0xffff00} );
 
-  var skeleton = new CANNON.Body({ mass: 4 });
-  skeleton.addShape(skeletonShape);
-  skeleton.position.set(0, 5, 0);
-  skeleton.linearDamping = 0.98;
-  world.addBody(skeleton);
+  var skele = new CANNON.Body({ mass: 4 });
+  skele.addShape(skeletonShape);
+  skele.position.set(x, y, z);
+  skele.linearDamping = 0.98;
+  world.addBody(skele);
+
   var sphere = new THREE.Mesh( geometry, material );
-  sphere.position.set(x, 5, z);
+  sphere.position.set(x, y, z);
   scene.add( sphere );
 
-  var velocity = skeleton.velocity;
+  var velocity = skele.velocity;
   this.getSkeleton = function () { return skeleton; };
   this.getMesh = function () { return sphere; };
 
-  skeleton.addEventListener("collide",function(e){
+  skele.addEventListener("collide",function(e){
     if (e.body.name == 'player')
       console.log("EATEN BY SKELETON");
   });
@@ -55,6 +56,6 @@ var skeleton = function (x, z) {
     velocity.x += inputVelocity.x;
     velocity.z += inputVelocity.z;
 
-    sphere.position.copy(skeleton.position);
+    sphere.position.copy(skele.position);
   };
 }

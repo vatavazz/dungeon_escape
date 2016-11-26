@@ -3,6 +3,7 @@ var createRoom3 = function (secret) {
   world = new CANNON.World();
   world.quatNormalizeSkip = 0;
   world.quatNormalizeFast = false;
+  var ai;
 
   var solver = new CANNON.GSSolver();
 
@@ -42,6 +43,23 @@ var createRoom3 = function (secret) {
 
   controls = new PointerLockControls( camera , player, x, y, z, true );
   scene.add( controls.getObject() );
+
+  var skellies = [
+    [150, 17.5, 125],
+    [0, 17.5, 125],
+    [150, 17.5, 30],
+    [0, 17.5, 30],
+
+    [-30, 17.5, 0],
+    [-125, 17.5, 0],
+    [-30, 17.5, -150],
+    [-125, 17.5, -150]
+  ];
+
+  for (var i = 0; i<skellies.length; i++) {
+    ai = new skeleton(skellies[i][0], skellies[i][1], skellies[i][2]);
+    ais.push(ai);
+  }
 
   // floor
   var floorGeo = new THREE.PlaneGeometry(350, 350, 5, 5);
@@ -172,13 +190,13 @@ var createRoom3 = function (secret) {
   ];
   var wall;
   var boxBody, boxShape;
-  for (var pos in positions) {
+  for (var pos = 0; pos<positions.length; pos++){
     wall = new THREE.Mesh( geometry, material );
     wall.position.set(positions[pos][0], positions[pos][1], positions[pos][2]);
     if (positions[pos][2] == 75 ) {
-      boxShape = new CANNON.Box(new CANNON.Vec3(25,12.5,100));
+      boxShape = new CANNON.Box(new CANNON.Vec3(25,7.5,100));
       wall.rotation.y = Math.PI/2;
-    } else if (positions[pos][1] != 85) boxShape = new CANNON.Box(new CANNON.Vec3(100,12.5,25));
+    } else if (positions[pos][1] != 85) boxShape = new CANNON.Box(new CANNON.Vec3(100,7.5,25));
     wall.castShadow = true;
     scene.add( wall );
     boxBody = new CANNON.Body({ mass: 0 });
@@ -270,7 +288,7 @@ var createRoom3 = function (secret) {
   ];
   var pillar;
   var pillarBody;
-  for (var pos in positions) {
+  for (var pos = 0; pos<positions.length; pos++) {
     pillar = new THREE.Mesh( pillargeometry, pillarmaterial );
     pillar.position.set(positions[pos][0], positions[pos][1], positions[pos][2]);
     pillar.castShadow = true;
@@ -311,8 +329,4 @@ var createRoom3 = function (secret) {
   light = new THREE.PointLight( "rgb(241, 148, 61)", 10, 80 );
   light.position.set( 85, 50, -85);
   scene.add( light );
-
-  // TODO doors (4)
-  // TODO enemies
-  // TODO arches
 }

@@ -192,7 +192,7 @@ var createRoom1 = function (start) {
     var torchmaterial = new THREE.MeshBasicMaterial( { color: "rgb(241, 148, 61)" } );
 
     var positions = [55, 5, -45, -95];
-    for (var i in positions) {
+    for (var i = 0; i<positions.length; i++) {
       // right side
       pillar = new THREE.Mesh( pillargeometry, pillarmaterial );
       pillar.position.set(30, 85, positions[i]);
