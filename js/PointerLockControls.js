@@ -8,6 +8,7 @@
     var velocityFactor = 1.5;
     var jumpVelocity = 80;
     var scope = this;
+    var isMoving = true;
 
     var pitchObject = new THREE.Object3D();
     pitchObject.add( camera );
@@ -68,18 +69,22 @@
             case 38: // up
             case 87: // w
                 moveForward = true;
+                isMoving = true;
                 break;
             case 37: // left
             case 65: // a
                 moveLeft = true;
+                isMoving = true;
 								break;
             case 40: // down
             case 83: // s
                 moveBackward = true;
+                isMoving = true;
                 break;
             case 39: // right
             case 68: // d
                 moveRight = true;
+                isMoving = true;
                 break;
             case 32: // space
                 if (canJump) velocity.y = jumpVelocity;
@@ -92,18 +97,22 @@
             case 38: // up
             case 87: // w
                 moveForward = false;
+                isMoving = false;
                 break;
             case 37: // left
             case 65: // a
                 moveLeft = false;
+                isMoving = false;
                 break;
             case 40: // down
             case 83: // a
                 moveBackward = false;
+                isMoving = false;
                 break;
             case 39: // right
             case 68: // d
                 moveRight = false;
+                isMoving = false;
                 break;
         }
     };
@@ -124,11 +133,16 @@
 
     var inputVelocity = new THREE.Vector3();
     var euler = new THREE.Euler();
+    var vel = new THREE.Vector3();
     this.update = function (delta) {
 			if ( !scope.enabled ) return;
 
 			delta *= 0.1;
+
 			inputVelocity.set(0,0,0);
+
+      // get rid of momentum - its a bit choppy
+      if (!moveForward && !moveBackward && !moveLeft && !moveRight) velocity.set(0,velocity.y,0);
 
 			// FIXME no ammortisation
 			if ( moveForward ) inputVelocity.z = -velocityFactor * delta;
@@ -136,19 +150,16 @@
 			if ( moveLeft ) inputVelocity.x = -velocityFactor * delta;
 			if ( moveRight ) inputVelocity.x = velocityFactor * delta;
 
-
 			euler.x = pitchObject.rotation.x;
 			euler.y = yawObject.rotation.y;
 			euler.order = "XYZ";
       // get rid of gimble lock
 			quat.setFromEuler(euler);
+
 			inputVelocity.applyQuaternion(quat);
 
 			velocity.x += inputVelocity.x;
 			velocity.z += inputVelocity.z;
-
-      // if (!moveForward && !moveBackward) velocity.z = 0;
-      // if (!moveRight && !moveLeft) velocity.x = 0;
 
 			yawObject.position.copy(player.position);
       yawObject.position.y+=10;

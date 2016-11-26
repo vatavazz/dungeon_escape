@@ -13,7 +13,7 @@ var createRoom2 = function (start) {
   solver.tolerance = 0.1;
   world.solver = new CANNON.SplitSolver(solver);
 
-  world.gravity.set(0,-80,0);
+  world.gravity.set(0,-100,0);
   world.broadphase = new CANNON.NaiveBroadphase();
 
   var physicsMaterial = new CANNON.Material( "slipperyMaterial" );
