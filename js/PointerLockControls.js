@@ -6,7 +6,7 @@
  var PointerLockControls = function ( camera, player, x, y, z, change ) {
     var eyeYPos = 10;
     var velocityFactor = 1.5;
-    var jumpVelocity = 200;
+    var jumpVelocity = 80;
     var scope = this;
 
     var pitchObject = new THREE.Object3D();
@@ -14,7 +14,7 @@
 
     var yawObject = new THREE.Object3D();
     yawObject.position.x = x;
-		yawObject.position.y = y;
+		yawObject.position.y = y+10;
 		yawObject.position.z = z;
     yawObject.add( pitchObject );
 
@@ -30,11 +30,21 @@
     var contactNormal = new CANNON.Vec3();
     var upAxis = new CANNON.Vec3(0,1,0);
     // FIXME was > 0.5, now jumping upon collision possible
+    var contactNormal = new CANNON.Vec3(); // Normal in the contact, pointing *out* of whatever the player touched
+    var upAxis = new CANNON.Vec3(0,1,0);
     player.addEventListener("collide",function(e){
         var contact = e.contact;
-        if (contact.bi.id == player.id) contact.ni.negate(contactNormal);
-        else contactNormal.copy(contact.ni);
-				if (contactNormal.dot(upAxis) >= 0) canJump = true;
+
+        // contact.bi and contact.bj are the colliding bodies, and contact.ni is the collision normal.
+        // We do not yet know which one is which! Let's check.
+        if(contact.bi.id == player.id)  // bi is the player body, flip the contact normal
+            contact.ni.negate(contactNormal);
+        else
+            contactNormal.copy(contact.ni); // bi is something else. Keep the normal as it is
+
+        // If contactNormal.dot(upAxis) is between 0 and 1, we know that the contact normal is somewhat in the up direction.
+        if(contactNormal.dot(upAxis) > 0.5) // Use a "good" threshold value between 0 and 1 here!
+            canJump = true;
     });
 
     var velocity = player.velocity;
@@ -126,6 +136,7 @@
 			if ( moveLeft ) inputVelocity.x = -velocityFactor * delta;
 			if ( moveRight ) inputVelocity.x = velocityFactor * delta;
 
+
 			euler.x = pitchObject.rotation.x;
 			euler.y = yawObject.rotation.y;
 			euler.order = "XYZ";
@@ -136,6 +147,10 @@
 			velocity.x += inputVelocity.x;
 			velocity.z += inputVelocity.z;
 
+      // if (!moveForward && !moveBackward) velocity.z = 0;
+      // if (!moveRight && !moveLeft) velocity.x = 0;
+
 			yawObject.position.copy(player.position);
+      yawObject.position.y+=10;
 		};
 };

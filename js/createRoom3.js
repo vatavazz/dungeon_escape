@@ -13,7 +13,7 @@ var createRoom3 = function (secret) {
   solver.tolerance = 0.1;
   world.solver = new CANNON.SplitSolver(solver);
 
-  world.gravity.set(0,-200,0);
+  world.gravity.set(0,-80,0);
   world.broadphase = new CANNON.NaiveBroadphase();
 
   var physicsMaterial = new CANNON.Material( "slipperyMaterial" );
@@ -30,7 +30,7 @@ var createRoom3 = function (secret) {
   else var x = 75, y = 10, z = 160;
 
   player.position.set(x, y, z);
-  player.linearDamping = 0.98;
+  player.linearDamping = 0.9;
   player.name = 'player';
   world.addBody(player);
 
