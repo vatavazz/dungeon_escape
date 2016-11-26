@@ -74,7 +74,6 @@ var createRoom2 = function (start) {
   wallMesh.position.set(0, 85, 150);
   wallMesh.receiveShadow = true;
   scene.add(wallMesh);
-
   var wallShape = new CANNON.Plane();
   var wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
@@ -86,7 +85,6 @@ var createRoom2 = function (start) {
   wallMesh.position.set(0, 85, -150);
   wallMesh.receiveShadow = true;
   scene.add(wallMesh);
-
   wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.position.set(0, 0, -150);
@@ -99,7 +97,6 @@ var createRoom2 = function (start) {
   wallMesh.position.set(50, 50, 0);
   wallMesh.receiveShadow = true;
   scene.add(wallMesh);
-
   wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0),-Math.PI/2);
@@ -110,7 +107,6 @@ var createRoom2 = function (start) {
   wallMesh.position.set(-50, 50, 0);
   wallMesh.receiveShadow = true;
   scene.add(wallMesh);
-
   wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0),Math.PI/2);

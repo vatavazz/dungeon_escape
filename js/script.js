@@ -2,7 +2,7 @@
 // TODO integrate torch puzzle
 // TODO skeleton fight
 
-var clock = new THREE.Clock();
+
 var scene, camera, renderer, world;
 var player;
 var pLockEnabled = 'pointerLockElement' in document || 'mozPointerLockElement' in document || 'webkitPointerLockElement' in document;
@@ -12,12 +12,14 @@ var footstep = new Audio('sfx/step.wav');
 var time = Date.now();
 var ais = [];
 
+var clock;
 initPointerLock();
 init();
 animate();
 
 function init() {
   initWorld();
+  clock = new THREE.Clock();
   scene = new THREE.Scene;
   createRoom1(true);
 
@@ -58,14 +60,15 @@ var dt = 1/60;
 function animate() {
   requestAnimationFrame(animate);
   if (controls.enabled) world.step(dt);
-  controls.update( Date.now() - time );
+  controls.update( Date.now() -  time );
   for (var i = 0; i < ais.length; i++) {
-    ais[i].update(Date.now() - time);
+    ais[i].update( Date.now() -  time );
   }
   // createRoom3.update( Date.now() - time );
   renderer.render( scene, camera );
   time = Date.now();
 }
+
 var container = document.getElementById( 'container' );
 function initPointerLock() {
   var element = document.body;
@@ -75,7 +78,6 @@ function initPointerLock() {
           document.mozPointerLockElement === element ||
           document.webkitPointerLockElement === element) {
         controls.enabled = true;
-        console.log("enabled");
         container.style.display = 'none';
       } else {
         controls.enabled = false;

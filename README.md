@@ -1,3 +1,6 @@
-# dungeon_escape
+# Escape from the Dungeon
 
-lets dooooooo disssssss
+WebGL first-person action-adventure game
+
+TODO:
+* 

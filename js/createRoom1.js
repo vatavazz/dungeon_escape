@@ -41,8 +41,6 @@ var createRoom1 = function (start) {
   else controls = new PointerLockControls( camera , player, x, y, z, true );
   scene.add( controls.getObject() );
 
-
-
   // floor
   var floorGeo = new THREE.PlaneGeometry(140, 200, 5, 5);
 	var floorTex = new THREE.TextureLoader().load('textures/bricks.png' );
@@ -53,7 +51,6 @@ var createRoom1 = function (start) {
   floorMesh.rotation.x = Math.PI/2;
   floorMesh.receiveShadow = true;
   scene.add(floorMesh);
-
   var groundShape = new CANNON.Plane();
   var groundBody = new CANNON.Body({ mass: 0 });
   groundBody.addShape(groundShape);
@@ -65,7 +62,6 @@ var createRoom1 = function (start) {
 	roofTex.wrapS = roofTex.wrapT = THREE.RepeatWrapping;
 	roofTex.repeat.set(8, 8);
 	var roofMat = new THREE.MeshLambertMaterial({ map: roofTex, side: THREE.DoubleSide});
-
   var roofGeo = new THREE.CylinderGeometry( 70, 70, 200, 32, 32, true, 0, 3.15 );
   var roofMesh = new THREE.Mesh( roofGeo, roofMat );
   roofMesh.rotation.x = Math.PI/2;
@@ -78,6 +74,8 @@ var createRoom1 = function (start) {
 	var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
 	wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
 	wallTex.repeat.set(8, 8);
+  var wallShape = new CANNON.Plane();
+
 	var wallMat = new THREE.MeshLambertMaterial({ map: wallTex, side: THREE.DoubleSide});
 
   var wallMesh = new THREE.Mesh(wallGeo, wallMat);
@@ -85,7 +83,6 @@ var createRoom1 = function (start) {
   wallMesh.receiveShadow = true;
   scene.add(wallMesh);
 
-  var wallShape = new CANNON.Plane();
   var wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0),-Math.PI);
@@ -96,7 +93,6 @@ var createRoom1 = function (start) {
   wallMesh.position.set(0, 85, -100);
   wallMesh.receiveShadow = true;
   scene.add(wallMesh);
-
   wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.position.set(0, 0, -100);
@@ -109,7 +105,6 @@ var createRoom1 = function (start) {
   wallMesh.position.set(70, 50, 0);
   wallMesh.receiveShadow = true;
   scene.add(wallMesh);
-
   wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0),-Math.PI/2);
@@ -120,7 +115,6 @@ var createRoom1 = function (start) {
   wallMesh.position.set(-70, 50, 0);
   wallMesh.receiveShadow = true;
   scene.add(wallMesh);
-
   wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0),Math.PI/2);
@@ -141,7 +135,6 @@ var createRoom1 = function (start) {
     wall.position.set(30, 20, 80);
     wall.castShadow = true;
     scene.add( wall );
-
     var boxBody = new CANNON.Body({ mass: 0 });
     boxBody.addShape(boxShape);
     boxBody.position.set(30, 20, 80);
@@ -151,7 +144,6 @@ var createRoom1 = function (start) {
     wall.position.set(-30, 20, 80);
     wall.castShadow = true;
     scene.add( wall );
-
     boxBody = new CANNON.Body({ mass: 0 });
     boxBody.addShape(boxShape);
     boxBody.position.set(-30, 20, 80);
@@ -180,8 +172,8 @@ var createRoom1 = function (start) {
     var pillarBody;
     var pillargeometry = new THREE.BoxGeometry( 10, 170, 10 );
     var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
-      wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
-  	  wallTex.repeat.set(0.5, 4);
+    wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+	  wallTex.repeat.set(0.5, 4);
     var pillarmaterial = new THREE.MeshLambertMaterial( { map: wallTex } );
     var pillarShape = new CANNON.Box(new CANNON.Vec3(5,85,5));
 
@@ -198,7 +190,6 @@ var createRoom1 = function (start) {
       pillar.position.set(30, 85, positions[i]);
       pillar.castShadow = true;
       scene.add( pillar );
-
       pillarBody = new CANNON.Body({ mass: 0 });
       pillarBody.addShape(pillarShape);
       pillarBody.position.set(30, 85, positions[i]);
@@ -207,7 +198,6 @@ var createRoom1 = function (start) {
       torch = new THREE.Mesh( torchgeometry, torchmaterial );
       torch.position.set(25, 25, positions[i]);
       scene.add( torch );
-
       light = new THREE.PointLight( "rgb(241, 148, 61)", 0.4-i/4, 80 );
       light.position.set( 25, 25, positions[i] );
       scene.add( light );
@@ -217,7 +207,6 @@ var createRoom1 = function (start) {
       pillar.position.set(-30, 85, positions[i]);
       pillar.castShadow = true;
       scene.add( pillar );
-
       pillarBody = new CANNON.Body({ mass: 0 });
       pillarBody.addShape(pillarShape);
       pillarBody.position.set(-30, 85, positions[i]);
@@ -226,7 +215,6 @@ var createRoom1 = function (start) {
       torch = new THREE.Mesh( torchgeometry, torchmaterial );
       torch.position.set( -25, 25, positions[i] );
       scene.add( torch );
-
       light = new THREE.PointLight( "rgb(241, 148, 61)", 0.4-i/4, 80 );
       light.position.set( -25, 25, positions[i] );
       scene.add( light );
