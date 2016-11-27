@@ -345,17 +345,21 @@ var createRoom3 = function (secret) {
   var altarBody;
   var altargeometry = new THREE.CylinderGeometry( 45, 50, 5, 32 );
   var altarmaterial = new THREE.MeshPhongMaterial( { map: brickTexture, normalMap: normal, bumpMap: displacement, specularMap: specular, } );
-  var altarShape = new CANNON.Cylinder(22.5, 25, 2.5, 32);
+  var altarShape = new CANNON.Cylinder(45, 50, 5, 32);
 
   altar = new THREE.Mesh(altargeometry, altarmaterial);
   altar.position.set(110, 2.5, -110);
   scene.add(altar);
 
-  // FIXME wrong???
-  // var altarBody = new CANNON.Body({ mass: 0 });
-  // altarBody.addShape(altarShape);
-  // altarBody.position.set(110, 2.5, -110);
-  // world.add(altarBody);
+  var altarBody = new CANNON.Body({ mass: 0 });
+  altarBody.addShape(altarShape);
+  altarBody.position.set(110, 0, -110);
+  // rotate so it matches threejs cylinder!!
+  var quat = new CANNON.Quaternion();
+  quat.setFromAxisAngle(new CANNON.Vec3(1,0,0),-Math.PI/2);
+  var translation = new CANNON.Vec3(0,0,0);
+  altarBody.shapes[0].transformAllPoints(translation,quat);
+  world.add(altarBody);
 
   light = new THREE.PointLight( "rgb(137, 223, 242)", 5, 80 );
   light.position.set( 85, 50, -85);
