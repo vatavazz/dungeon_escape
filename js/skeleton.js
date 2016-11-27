@@ -21,7 +21,7 @@ var skeleton = function (x, y, z) {
 
   skele.addEventListener("collide",function(e){
     if (e.body.name == 'player')
-      console.log("EATEN BY SKELETON");
+      dealDamage(10);
   });
 
   var velocityFactor = 0.5;
@@ -46,10 +46,7 @@ var skeleton = function (x, y, z) {
     inputVelocity.x = -velocityFactor * delta;
     inputVelocity.x = velocityFactor * delta;
 
-    // euler.x = pitchObject.rotation.x;
-    // euler.y = yawObject.rotation.y;
     euler.order = "XYZ";
-    // // get rid of gimble lock
     quat.setFromEuler(euler);
     inputVelocity.applyQuaternion(quat);
 

@@ -3,4 +3,5 @@
 WebGL first-person action-adventure game
 
 TODO:
-* 
+* finish UI
+*

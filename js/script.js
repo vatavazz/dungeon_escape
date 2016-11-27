@@ -11,6 +11,7 @@ var controls;
 var footstep = new Audio('sfx/step.wav');
 var time = Date.now();
 var ais = [];
+var playerHealth = 100;
 
 var bgm = new Audio('sfx/background.ogg');
 var steps = new Audio('sfx/step.wav');
@@ -75,6 +76,11 @@ function animate() {
 
 var container = document.getElementById( 'container' );
 var pointer = document.getElementById( 'pointer' );
+
+var bardiv = document.getElementById( 'bar' );
+var healthdiv = document.getElementById( 'health' );
+var missingdiv = document.getElementById( 'missing' );
+
 function initPointerLock() {
   var element = document.body;
   if (pLockEnabled) {
@@ -90,7 +96,10 @@ function initPointerLock() {
         container.style.display = '-webkit-box';
         container.style.display = '-moz-box';
         container.style.display = 'box';
-        pointer.style.display = 'none';
+        // pointer.style.display = 'none';
+        // bardiv.style.display = 'none';
+        // healthdiv.style.display = 'none';
+        // missingdiv.style.display = 'none';
       }
     };
 
@@ -121,4 +130,16 @@ function onWindowResize() {
   camera.aspect = window.innerWidth / window.innerHeight;
   camera.updateProjectionMatrix();
   renderer.setSize( window.innerWidth, window.innerHeight );
+}
+
+function dealDamage(dmg) {
+  playerHealth-=dmg;
+  updateHealthDisplay();
+  // return true if dead
+  if (playerHealth <= 0) return true;
+}
+
+function updateHealthDisplay () {
+  var hValue = playerHealth +"%";
+  document.querySelector("#health").style.width =hValue;
 }
