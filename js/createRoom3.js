@@ -27,13 +27,26 @@ var createRoom3 = function (secret) {
   player.addShape(playerShape);
 
   // player positioning if entered from secret passage
-  if (secret) var x = 0, y = 90, z = 160;
+  if (secret) var x = 0, y = 90, z = 150;
   else var x = 75, y = 10, z = 160;
 
   player.position.set(x, y, z);
   player.linearDamping = 0.9;
   player.name = 'player';
   world.addBody(player);
+
+  var displacement = new THREE.TextureLoader().load('textures/DisplacementMap.png');
+  displacement.wrapS = displacement.wrapT = THREE.RepeatWrapping;
+	displacement.repeat.set(8, 8);
+  var normal = new THREE.TextureLoader().load('textures/NormalMap.png');
+  normal.wrapS = normal.wrapT = THREE.RepeatWrapping;
+	normal.repeat.set(8, 8);
+  var specular = new THREE.TextureLoader().load('textures/SpecularMap.png');
+  specular.wrapS = specular.wrapT = THREE.RepeatWrapping;
+	specular.repeat.set(8, 8);
+  var ambient = new THREE.TextureLoader().load('textures/AmbientOcclusionMap.png');
+  ambient.wrapS = ambient.wrapT = THREE.RepeatWrapping;
+	ambient.repeat.set(8, 8);
 
   var ambientLight = new THREE.AmbientLight( "rgb(48, 48, 61)" );
   scene.add( ambientLight );
@@ -66,7 +79,7 @@ var createRoom3 = function (secret) {
 	var brickTexture = new THREE.TextureLoader().load('textures/bricks.png' );
 	brickTexture.wrapS = brickTexture.wrapT = THREE.RepeatWrapping;
 	brickTexture.repeat.set(10, 10);
-	var floorMat = new THREE.MeshLambertMaterial({ map: brickTexture, side: THREE.DoubleSide });
+	var floorMat = new THREE.MeshPhongMaterial({ map: brickTexture,normalMap: normal, bumpMap: displacement, specularMap: specular, side: THREE.DoubleSide });
   var floorMesh = new THREE.Mesh(floorGeo, floorMat);
   floorMesh.rotation.x = Math.PI/2;
   floorMesh.receiveShadow = true;
@@ -89,7 +102,7 @@ var createRoom3 = function (secret) {
 	brickTexture = new THREE.TextureLoader().load('textures/bricks.png');
 	brickTexture.wrapS = brickTexture.wrapT = THREE.RepeatWrapping;
 	brickTexture.repeat.set(8, 8);
-	var wallMat = new THREE.MeshLambertMaterial({ map: brickTexture, side: THREE.DoubleSide});
+	var wallMat = new THREE.MeshPhongMaterial({ map: brickTexture,normalMap: normal, bumpMap: displacement, specularMap: specular, side: THREE.DoubleSide});
 
   var wallMesh = new THREE.Mesh(wallGeo, wallMat);
   wallMesh.position.set(0, 85, 175);
@@ -136,7 +149,7 @@ var createRoom3 = function (secret) {
 
   // door back
   geometry = new THREE.BoxGeometry( 10, 40, 40 );
-  material = new THREE.MeshLambertMaterial( {color: "rgb(177, 177, 177)", map: brickTexture } );
+  material = new THREE.MeshPhongMaterial( {color: "rgb(177, 177, 177)", map: brickTexture,normalMap: normal, bumpMap: displacement, specularMap: specular, } );
   boxShape = new CANNON.Box(new CANNON.Vec3(20,20,5));
 
   wall = new THREE.Mesh( geometry, material );
@@ -165,7 +178,7 @@ var createRoom3 = function (secret) {
 
   // FIXME collision
   var curvegeometry = new THREE.CylinderGeometry( 175, 175, 170, 32, 2, true, Math.PI/2, Math.PI/2);
-  var curvematerial = new THREE.MeshLambertMaterial( { map: brickTexture, side: THREE.DoubleSide  } );
+  var curvematerial = new THREE.MeshPhongMaterial( { map: brickTexture, normalMap: normal, bumpMap: displacement, specularMap: specular,side: THREE.DoubleSide  } );
   var curveShape = new CANNON.Cylinder(22.5, 25, 2.5, 32);
   var curve = new THREE.Mesh(curvegeometry, curvematerial);
   curve.position.set(0, 85, 0);
@@ -175,8 +188,8 @@ var createRoom3 = function (secret) {
   var geometry = new THREE.BoxGeometry( 200, 15, 50 );
   brickTexture = new THREE.TextureLoader().load('textures/bricks.png');
   brickTexture.wrapS = brickTexture.wrapT = THREE.RepeatWrapping;
-	brickTexture.repeat.set(13.33, 1);
-  var material = new THREE.MeshLambertMaterial( { map: brickTexture, color: "rgb(105, 122, 111)" } );
+	brickTexture.repeat.set(13.33, 10);
+  var material = new THREE.MeshPhongMaterial( { map: brickTexture,normalMap: normal, bumpMap: displacement, specularMap: specular, color: "rgb(105, 122, 111)" } );
 
   var positions = [
     [0, 7.5, 75],
@@ -208,7 +221,7 @@ var createRoom3 = function (secret) {
   // extra walls
   geometry = new THREE.BoxGeometry( 150, 170, 1 );
   brickTexture.repeat.set(8, 8);
-  material = new THREE.MeshLambertMaterial( { map: brickTexture } );
+  material = new THREE.MeshPhongMaterial( { map: brickTexture,normalMap: normal, bumpMap: displacement, specularMap: specular, } );
 
   wall = new THREE.Mesh( geometry, material );
   wall.position.set(-25, 85, 100);
@@ -261,7 +274,7 @@ var createRoom3 = function (secret) {
   brickTexture = new THREE.TextureLoader().load('textures/bricks.png');
   brickTexture.wrapS = brickTexture.wrapT = THREE.RepeatWrapping;
 	brickTexture.repeat.set(1, 17);
-  var pillarmaterial = new THREE.MeshLambertMaterial( { map:brickTexture, color: "rgb(169, 177, 172)" } );
+  var pillarmaterial = new THREE.MeshPhongMaterial( { map:brickTexture,normalMap: normal, bumpMap: displacement, specularMap: specular, color: "rgb(169, 177, 172)" } );
   var pillarShape = new CANNON.Box(new CANNON.Vec3(5,85,5));
 
   // TODO torches
@@ -299,11 +312,39 @@ var createRoom3 = function (secret) {
     world.add(pillarBody);
   }
 
+  var light;
+  var torch;
+  var torchgeometry = new THREE.SphereGeometry( 1, 16, 16 );
+  var torchmaterial = new THREE.MeshBasicMaterial( { color: "rgb(241, 148, 61)" } );
+  positions = [
+    [115, 170],
+    [115, 75],
+    [115, -20],
+    [35, 170],
+    [35, 75],
+    [35, -20],
+
+    [20, -35],
+    [-75, -35],
+    [-170, -35],
+    [20, -115],
+    [-75, -115],
+    [-170, -115],
+  ];
+  for (var i = 0; i < positions.length; i++) {
+    light = new THREE.PointLight( "rgb(241, 148, 61)", 0.4, 80 );
+    light.position.set( positions[i][0], 25, positions[i][1] );
+    scene.add( light );
+    torch = new THREE.Mesh( torchgeometry, torchmaterial );
+    torch.position.set( positions[i][0], 25, positions[i][1] );
+    scene.add( torch );
+  }
+
   // altar
   var altar;
   var altarBody;
   var altargeometry = new THREE.CylinderGeometry( 45, 50, 5, 32 );
-  var altarmaterial = new THREE.MeshLambertMaterial( { color: 0x8888ff } );
+  var altarmaterial = new THREE.MeshPhongMaterial( { map: brickTexture, normalMap: normal, bumpMap: displacement, specularMap: specular, } );
   var altarShape = new CANNON.Cylinder(22.5, 25, 2.5, 32);
 
   altar = new THREE.Mesh(altargeometry, altarmaterial);
@@ -316,17 +357,7 @@ var createRoom3 = function (secret) {
   // altarBody.position.set(110, 2.5, -110);
   // world.add(altarBody);
 
-  // temporary lights
-  light = new THREE.PointLight( "rgb(241, 148, 61)", 10, 80 );
-  light.position.set( -85, 50, -85);
-  scene.add( light );
-  light = new THREE.PointLight( "rgb(241, 148, 61)", 10, 80 );
-  light.position.set( 85, 50, 85);
-  scene.add( light );
-  light = new THREE.PointLight( "rgb(241, 148, 61)", 10, 80 );
-  light.position.set( -85, 50, 85);
-  scene.add( light );
-  light = new THREE.PointLight( "rgb(241, 148, 61)", 10, 80 );
+  light = new THREE.PointLight( "rgb(137, 223, 242)", 5, 80 );
   light.position.set( 85, 50, -85);
   scene.add( light );
 }

@@ -31,6 +31,20 @@ var createRoom1 = function (start) {
   player.name = 'player';
   world.addBody(player);
 
+  var texture = new THREE.TextureLoader().load('textures/bricks.png');
+  var displacement = new THREE.TextureLoader().load('textures/DisplacementMap.png');
+  displacement.wrapS = displacement.wrapT = THREE.RepeatWrapping;
+	displacement.repeat.set(8, 8);
+  var normal = new THREE.TextureLoader().load('textures/NormalMap.png');
+  normal.wrapS = normal.wrapT = THREE.RepeatWrapping;
+	normal.repeat.set(8, 8);
+  var specular = new THREE.TextureLoader().load('textures/SpecularMap.png');
+  specular.wrapS = specular.wrapT = THREE.RepeatWrapping;
+	specular.repeat.set(8, 8);
+  var ambient = new THREE.TextureLoader().load('textures/AmbientOcclusionMap.png');
+  ambient.wrapS = ambient.wrapT = THREE.RepeatWrapping;
+	ambient.repeat.set(8, 8);
+
   var ambientLight = new THREE.AmbientLight( "rgb(48, 48, 61)" );
   scene.add( ambientLight );
 
@@ -46,7 +60,7 @@ var createRoom1 = function (start) {
 	var floorTex = new THREE.TextureLoader().load('textures/bricks.png' );
 	floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
 	floorTex.repeat.set(8, 8);
-	var floorMat = new THREE.MeshLambertMaterial({ map: floorTex, side: THREE.DoubleSide });
+	var floorMat = new THREE.MeshPhongMaterial({ map: floorTex, normalMap: normal, bumpMap: displacement, specularMap: specular, side: THREE.DoubleSide });
   var floorMesh = new THREE.Mesh(floorGeo, floorMat);
   floorMesh.rotation.x = Math.PI/2;
   floorMesh.receiveShadow = true;
@@ -61,7 +75,7 @@ var createRoom1 = function (start) {
 	var roofTex = new THREE.TextureLoader().load('textures/bricks.png');
 	roofTex.wrapS = roofTex.wrapT = THREE.RepeatWrapping;
 	roofTex.repeat.set(8, 8);
-	var roofMat = new THREE.MeshLambertMaterial({ map: roofTex, side: THREE.DoubleSide});
+	var roofMat = new THREE.MeshPhongMaterial({ map: floorTex, normalMap: normal, bumpMap: displacement, specularMap: specular, side: THREE.DoubleSide});
   var roofGeo = new THREE.CylinderGeometry( 70, 70, 200, 32, 32, true, 0, 3.15 );
   var roofMesh = new THREE.Mesh( roofGeo, roofMat );
   roofMesh.rotation.x = Math.PI/2;
@@ -76,7 +90,7 @@ var createRoom1 = function (start) {
 	wallTex.repeat.set(8, 8);
   var wallShape = new CANNON.Plane();
 
-	var wallMat = new THREE.MeshLambertMaterial({ map: wallTex, side: THREE.DoubleSide});
+	var wallMat = new THREE.MeshPhongMaterial({ map: wallTex, normalMap: normal, bumpMap: displacement, specularMap: specular, side: THREE.DoubleSide});
 
   var wallMesh = new THREE.Mesh(wallGeo, wallMat);
   wallMesh.position.set(0, 85, 100);
@@ -126,8 +140,12 @@ var createRoom1 = function (start) {
 
   function createWall() {
     var geometry = new THREE.BoxGeometry( 10, 40, 40 );
-    var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
-    var material = new THREE.MeshLambertMaterial( { map: wallTex } );
+
+    wallTex = new THREE.TextureLoader().load('textures/bricks.png');
+    wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
+    wallTex.repeat.set(2, 2);
+
+    var material = new THREE.MeshPhongMaterial( { map: wallTex, normalMap: normal,bumpMap: displacement,  specularMap: specular } );
 
     var boxShape = new CANNON.Box(new CANNON.Vec3(5,20,20));
 
@@ -149,7 +167,7 @@ var createRoom1 = function (start) {
     boxBody.position.set(-30, 20, 80);
     world.add(boxBody)
 
-    material = new THREE.MeshLambertMaterial( {color: "rgb(177, 177, 177)", map: wallTex } );
+    material = new THREE.MeshPhongMaterial( {color: 0x000000, map: wallTex, normalMap: normal, bumpMap: displacement, specularMap: specular, } );
     wall = new THREE.Mesh( geometry, material );
     wall.rotation.y = Math.PI/2;
     wall.position.set(0, 20, -95);
@@ -173,8 +191,8 @@ var createRoom1 = function (start) {
     var pillargeometry = new THREE.BoxGeometry( 10, 170, 10 );
     var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
     wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
-	  wallTex.repeat.set(0.5, 4);
-    var pillarmaterial = new THREE.MeshLambertMaterial( { map: wallTex } );
+	  wallTex.repeat.set(0.5, 8);
+    var pillarmaterial = new THREE.MeshPhongMaterial( { map: wallTex, normalMap: normal,  bumpMap: displacement, specularMap: specular, } );
     var pillarShape = new CANNON.Box(new CANNON.Vec3(5,85,5));
 
     // torch info
@@ -184,7 +202,7 @@ var createRoom1 = function (start) {
     var torchmaterial = new THREE.MeshBasicMaterial( { color: "rgb(241, 148, 61)" } );
 
     var positions = [55, 5, -45, -95];
-    for (var i = 0; i<positions.length; i++) {
+    for (var i = 0; i < positions.length; i++) {
       // right side
       pillar = new THREE.Mesh( pillargeometry, pillarmaterial );
       pillar.position.set(30, 85, positions[i]);

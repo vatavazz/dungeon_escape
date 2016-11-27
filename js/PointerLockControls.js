@@ -31,7 +31,7 @@
 
   var contactNormal = new CANNON.Vec3();
   var upAxis = new CANNON.Vec3(0,1,0);
-  var contactNormal = new CANNON.Vec3(); 
+  var contactNormal = new CANNON.Vec3();
   var upAxis = new CANNON.Vec3(0,1,0);
   player.addEventListener("collide",function(e){
     var contact = e.contact;
@@ -138,6 +138,8 @@
 		if ( moveBackward ) inputVelocity.z = velocityFactor * delta;
 		if ( moveLeft ) inputVelocity.x = -velocityFactor * delta;
 		if ( moveRight ) inputVelocity.x = velocityFactor * delta;
+
+    if (moveRight || moveLeft || moveBackward || moveForward) steps.play();
 
 		euler.x = pitchObject.rotation.x;
 		euler.y = yawObject.rotation.y;

@@ -31,6 +31,19 @@ var createRoom2 = function (start) {
   player.name = 'player';
   world.addBody(player);
 
+  var displacement = new THREE.TextureLoader().load('textures/DisplacementMap.png');
+  displacement.wrapS = displacement.wrapT = THREE.RepeatWrapping;
+	displacement.repeat.set(8, 8);
+  var normal = new THREE.TextureLoader().load('textures/NormalMap.png');
+  normal.wrapS = normal.wrapT = THREE.RepeatWrapping;
+	normal.repeat.set(8, 8);
+  var specular = new THREE.TextureLoader().load('textures/SpecularMap.png');
+  specular.wrapS = specular.wrapT = THREE.RepeatWrapping;
+	specular.repeat.set(8, 8);
+  var ambient = new THREE.TextureLoader().load('textures/AmbientOcclusionMap.png');
+  ambient.wrapS = ambient.wrapT = THREE.RepeatWrapping;
+	ambient.repeat.set(8, 8);
+
   var ambientLight = new THREE.AmbientLight( "rgb(48, 48, 61)" );
   scene.add( ambientLight );
 
@@ -45,7 +58,7 @@ var createRoom2 = function (start) {
   var floorTex = new THREE.TextureLoader().load('textures/bricks.png' );
   floorTex.wrapS = floorTex.wrapT = THREE.RepeatWrapping;
   floorTex.repeat.set(4, 8);
-  var floorMat = new THREE.MeshLambertMaterial({ map: floorTex, side: THREE.DoubleSide });
+  var floorMat = new THREE.MeshPhongMaterial({ map: floorTex,normalMap: normal, bumpMap: displacement, specularMap: specular, side: THREE.DoubleSide });
   var floorMesh = new THREE.Mesh(floorGeo, floorMat);
   floorMesh.rotation.x = Math.PI/2;
   floorMesh.receiveShadow = true;
@@ -68,7 +81,7 @@ var createRoom2 = function (start) {
 	var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
 	wallTex.wrapS = wallTex.wrapT = THREE.RepeatWrapping;
 	wallTex.repeat.set(8, 8);
-	var wallMat = new THREE.MeshLambertMaterial({ map: wallTex, side: THREE.DoubleSide});
+	var wallMat = new THREE.MeshPhongMaterial({ map: wallTex, normalMap: normal, bumpMap: displacement, specularMap: specular,side: THREE.DoubleSide});
 
   var wallMesh = new THREE.Mesh(wallGeo, floorMat);
   wallMesh.position.set(0, 85, 150);
@@ -129,7 +142,7 @@ var createRoom2 = function (start) {
 
   var geometry = new THREE.BoxGeometry( 10, 40, 40 );
   var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
-  var material = new THREE.MeshLambertMaterial( { map: wallTex } );
+  var material = new THREE.MeshPhongMaterial( { map: wallTex,normalMap: normal, bumpMap: displacement, specularMap: specular, } );
 
   var boxShape = new CANNON.Box(new CANNON.Vec3(5,20,20));
 
@@ -143,7 +156,7 @@ var createRoom2 = function (start) {
   world.add(boxBody)
   boxBody.addEventListener("collide",function(e){if (e.body.name == 'player') createRoom3(true);});
 
-  material = new THREE.MeshLambertMaterial( {color: "rgb(177, 177, 177)", map: wallTex } );
+  material = new THREE.MeshPhongMaterial( {color: 0x000, map: wallTex,normalMap: normal, bumpMap: displacement, specularMap: specular, } );
   boxShape = new CANNON.Box(new CANNON.Vec3(20,20,5));
 
   wall = new THREE.Mesh( geometry, material );

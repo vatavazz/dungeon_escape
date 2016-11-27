@@ -12,6 +12,13 @@ var footstep = new Audio('sfx/step.wav');
 var time = Date.now();
 var ais = [];
 
+var bgm = new Audio('sfx/background.ogg');
+var steps = new Audio('sfx/step.wav');
+bgm.preload = 'auto';
+steps.preload = 'auto';
+bgm.loop = true;
+bgm.play();
+
 var clock;
 initPointerLock();
 init();
@@ -61,15 +68,13 @@ function animate() {
   requestAnimationFrame(animate);
   if (controls.enabled) world.step(dt);
   controls.update( Date.now() -  time );
-  for (var i = 0; i < ais.length; i++) {
-    ais[i].update( Date.now() -  time );
-  }
-  // createRoom3.update( Date.now() - time );
+  for (var i = 0; i < ais.length; i++) ais[i].update( Date.now() -  time );
   renderer.render( scene, camera );
   time = Date.now();
 }
 
 var container = document.getElementById( 'container' );
+var pointer = document.getElementById( 'pointer' );
 function initPointerLock() {
   var element = document.body;
   if (pLockEnabled) {
@@ -79,11 +84,13 @@ function initPointerLock() {
           document.webkitPointerLockElement === element) {
         controls.enabled = true;
         container.style.display = 'none';
+        // pointer.style.display = '';
       } else {
         controls.enabled = false;
         container.style.display = '-webkit-box';
         container.style.display = '-moz-box';
         container.style.display = 'box';
+        pointer.style.display = 'none';
       }
     };
 
