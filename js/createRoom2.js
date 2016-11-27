@@ -1,5 +1,10 @@
 var createRoom2 = function (start) {
   scene = new THREE.Scene;
+  levelGeometry = new THREE.Object3D();
+    disappearingObjects = new Array();
+    movingObjects = new Array();
+    torches = new Array();
+    scene.add(levelGeometry);
   world = new CANNON.World();
   world.quatNormalizeSkip = 0;
   world.quatNormalizeFast = false;
@@ -46,6 +51,7 @@ var createRoom2 = function (start) {
 
   var ambientLight = new THREE.AmbientLight( "rgb(48, 48, 61)" );
   scene.add( ambientLight );
+  ambientLight.intensity = 1.5;
 
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
 	scene.add(camera);
@@ -62,7 +68,7 @@ var createRoom2 = function (start) {
   var floorMesh = new THREE.Mesh(floorGeo, floorMat);
   floorMesh.rotation.x = Math.PI/2;
   floorMesh.receiveShadow = true;
-  scene.add(floorMesh);
+  levelGeometry.add(floorMesh);
 
   var groundShape = new CANNON.Plane();
   var groundBody = new CANNON.Body({ mass: 0 });
@@ -74,7 +80,7 @@ var createRoom2 = function (start) {
   var roofMesh = new THREE.Mesh(floorGeo, floorMat);
   roofMesh.rotation.x = -Math.PI/1.9;
   roofMesh.position.set(0,60,0);
-  scene.add( roofMesh );
+  levelGeometry.add( roofMesh );
 
   // walls
   var wallGeo = new THREE.PlaneGeometry(100, 170, 5, 5);
@@ -86,7 +92,7 @@ var createRoom2 = function (start) {
   var wallMesh = new THREE.Mesh(wallGeo, floorMat);
   wallMesh.position.set(0, 85, 150);
   wallMesh.receiveShadow = true;
-  scene.add(wallMesh);
+  levelGeometry.add(wallMesh);
   var wallShape = new CANNON.Plane();
   var wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
@@ -97,7 +103,7 @@ var createRoom2 = function (start) {
   wallMesh = new THREE.Mesh(wallGeo, wallMat);
   wallMesh.position.set(0, 85, -150);
   wallMesh.receiveShadow = true;
-  scene.add(wallMesh);
+  levelGeometry.add(wallMesh);
   wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.position.set(0, 0, -150);
@@ -109,7 +115,7 @@ var createRoom2 = function (start) {
   wallMesh = new THREE.Mesh(wallGeo, wallMat);
   wallMesh.position.set(50, 50, 0);
   wallMesh.receiveShadow = true;
-  scene.add(wallMesh);
+  levelGeometry.add(wallMesh);
   wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0),-Math.PI/2);
@@ -119,7 +125,7 @@ var createRoom2 = function (start) {
   wallMesh = new THREE.Mesh(wallGeo, wallMat);
   wallMesh.position.set(-50, 50, 0);
   wallMesh.receiveShadow = true;
-  scene.add(wallMesh);
+  levelGeometry.add(wallMesh);
   wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0),Math.PI/2);
@@ -128,42 +134,34 @@ var createRoom2 = function (start) {
 
   var light;
   var torch;
-  var torchgeometry = new THREE.SphereGeometry( 1, 16, 16 );
-  var torchmaterial = new THREE.MeshBasicMaterial( { color: "rgb(241, 148, 61)" } );
   var positions = [35, -15];
-  for (var i = 0; i<positions.length; i++) {
-    light = new THREE.PointLight( "rgb(241, 148, 61)", 0.4, 80 );
-    light.position.set( -40, 25, positions[i] );
-    scene.add( light );
-    torch = new THREE.Mesh( torchgeometry, torchmaterial );
-    torch.position.set( -50, 25, positions[i]);
-    scene.add( torch );
-  }
+  for (var i = 0; i<positions.length; i++)
+    torch = createTorch(new THREE.Vector3(-50, 25, positions[i]), 180, true);
 
   var geometry = new THREE.BoxGeometry( 10, 40, 40 );
   var wallTex = new THREE.TextureLoader().load('textures/bricks.png');
-  var material = new THREE.MeshPhongMaterial( { map: wallTex,normalMap: normal, bumpMap: displacement, specularMap: specular, } );
+  var material = new THREE.MeshPhongMaterial( {color: 0x000, map: wallTex,normalMap: normal, bumpMap: displacement, specularMap: specular } );
 
   var boxShape = new CANNON.Box(new CANNON.Vec3(5,20,20));
 
   var wall = new THREE.Mesh( geometry, material );
   wall.position.set(-54.999, 20, 10);
   wall.castShadow = true;
-  scene.add( wall );
+  levelGeometry.add( wall );
   var boxBody = new CANNON.Body({ mass: 0 });
   boxBody.addShape(boxShape);
   boxBody.position.set(-54, 20, 10);
   world.add(boxBody)
-  boxBody.addEventListener("collide",function(e){if (e.body.name == 'player') createRoom3(true);});
+  boxBody.addEventListener("collide",function(e){if (e.body.name == 'player') createRoom4();});
 
-  material = new THREE.MeshPhongMaterial( {color: 0x000, map: wallTex,normalMap: normal, bumpMap: displacement, specularMap: specular, } );
+
   boxShape = new CANNON.Box(new CANNON.Vec3(20,20,5));
 
   wall = new THREE.Mesh( geometry, material );
   wall.rotation.y = Math.PI/2;
   wall.position.set(0, 20, -150);
   wall.castShadow = true;
-  scene.add( wall );
+  levelGeometry.add( wall );
   boxBody = new CANNON.Body({ mass: 0 });
   boxBody.addShape(boxShape);
   boxBody.position.set(0, 20, -150);
@@ -176,11 +174,23 @@ var createRoom2 = function (start) {
   wall.rotation.y = Math.PI/2;
   wall.position.set(0, 20, 150);
   wall.castShadow = true;
-  scene.add( wall );
+  levelGeometry.add( wall );
   boxBody = new CANNON.Body({ mass: 0 });
   boxBody.addShape(boxShape);
   boxBody.position.set(0, 20, 150);
   boxBody.name = "levelEnd";
   world.add(boxBody)
   boxBody.addEventListener("collide",function(e){if (e.body.name == 'player') createRoom1(false);});
+
+  // @kdz DisappearingObject that blocks the path to the secret corridor.
+    var dGeometry = new THREE.BoxGeometry(10, 40, 40);
+    var dTex = new THREE.TextureLoader().load('textures/bricks.png');
+    dTex.wrapS = dTex.wrapT = THREE.RepeatWrapping;
+    dTex.repeat.set(2, 4);
+    var dMaterial = new THREE.MeshLambertMaterial({map: dTex, side: THREE.DoubleSide});
+    var dBody = new CANNON.Body({mass: 0, shape: new CANNON.Box(new CANNON.Vec3(10, 40, 40))});
+    var dMesh = new THREE.Mesh(dGeometry, dMaterial);
+    var dObject = new THREE.Object3D();
+    dObject.add(dMesh);
+    var secretBlocker = new DisappearingObject(new THREE.Vector3(-54, 20, 10), dObject, dBody, torches[0], torches[1]);
 }

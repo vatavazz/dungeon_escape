@@ -13,6 +13,42 @@ var time = Date.now();
 var ais = [];
 var playerHealth = 100;
 
+// @kdz GLOBALS
+var torches; // An array that holds all the torches in the world.
+var triggers; // An array that hold all the triggers.
+var heroProjectiles;
+var projectileClock; // Timer that stops the player from shooting non-stop.
+var keyboard;
+var levelGeometry;
+var disappearingObjects;
+var movingObjects;
+var projector = new THREE.Projector();
+
+// @kdz Initializes global variables.
+function kInit() {
+    torches = new Array();
+    triggers = new Array();
+    heroProjectiles = new Object();
+    heroProjectiles["fireballs"] = new Array();
+    heroProjectiles["frostbolts"] = new Array();
+    projectileClock = new THREE.Clock(false);
+    keyboard = new THREEx.KeyboardState();
+    levelGeometry = new THREE.Object3D();
+}
+
+// @kdz Perform actions based on keyboard input.
+function getInput() {
+    if(keyboard.pressed("F")) {
+        shoot("fireball");
+    }
+    if(keyboard.pressed("E")) {
+        shoot("frostbolt");
+    }
+    if(keyboard.pressed("Q")) {
+        spawnProjectile("arrow", new THREE.Vector3(-5, 1, -5), controls.getObject().position);
+    }
+}
+
 var bgm = new Audio('sfx/background.ogg');
 var steps = new Audio('sfx/step.wav');
 bgm.preload = 'auto';
@@ -21,6 +57,7 @@ bgm.loop = true;
 bgm.play();
 
 var clock;
+kInit();
 initPointerLock();
 init();
 animate();
@@ -70,6 +107,24 @@ function animate() {
   if (controls.enabled) world.step(dt);
   controls.update( Date.now() -  time );
   for (var i = 0; i < ais.length; i++) ais[i].update( Date.now() -  time );
+
+  // @kdz Check triggers.
+    checkTriggers(); // Obviously.
+    updateHeroProjectiles(Date.now() - time);
+    getInput();
+    checkHeroProjectileCollisions();
+    updateDisappearingObjects();
+    updateMovingObjects(Date.now() - time);
+    checkSkeletonCollisions();
+
+    if (playerHealth <= 0) {
+      controls.enabled = false;
+      var gover = document.getElementById( 'gocont' );
+      gover.style.display = '-webkit-box';
+      gover.style.display = '-moz-box';
+      gover.style.display = 'box';
+    }//show gameover screen
+
   renderer.render( scene, camera );
   time = Date.now();
 }
@@ -79,7 +134,6 @@ var pointer = document.getElementById( 'pointer' );
 
 var bardiv = document.getElementById( 'bar' );
 var healthdiv = document.getElementById( 'health' );
-var missingdiv = document.getElementById( 'missing' );
 
 function initPointerLock() {
   var element = document.body;
@@ -96,10 +150,6 @@ function initPointerLock() {
         container.style.display = '-webkit-box';
         container.style.display = '-moz-box';
         container.style.display = 'box';
-        // pointer.style.display = 'none';
-        // bardiv.style.display = 'none';
-        // healthdiv.style.display = 'none';
-        // missingdiv.style.display = 'none';
       }
     };
 

@@ -1,6 +1,11 @@
 var createRoom3 = function (secret) {
   scene = new THREE.Scene;
   world = new CANNON.World();
+  disappearingObjects = new Array();
+    movingObjects = new Array();
+    torches = new Array();
+  levelGeometry = new THREE.Object3D();
+    scene.add(levelGeometry);
   world.quatNormalizeSkip = 0;
   world.quatNormalizeFast = false;
   var ai;
@@ -50,6 +55,7 @@ var createRoom3 = function (secret) {
 
   var ambientLight = new THREE.AmbientLight( "rgb(48, 48, 61)" );
   scene.add( ambientLight );
+  ambientLight.intensity = 1.5;
 
   camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 1, 1000);
 	scene.add(camera);
@@ -83,7 +89,7 @@ var createRoom3 = function (secret) {
   var floorMesh = new THREE.Mesh(floorGeo, floorMat);
   floorMesh.rotation.x = Math.PI/2;
   floorMesh.receiveShadow = true;
-  scene.add(floorMesh);
+  levelGeometry.add(floorMesh);
   var groundShape = new CANNON.Plane();
   var groundBody = new CANNON.Body({ mass: 0 });
   groundBody.addShape(groundShape);
@@ -95,7 +101,7 @@ var createRoom3 = function (secret) {
   roofMesh.rotation.x = Math.PI/2;
   roofMesh.position.set(0,170,0);
   roofMesh.receiveShadow = true;
-  scene.add(roofMesh);
+  levelGeometry.add(roofMesh);
 
   // walls
   var wallGeo = new THREE.PlaneGeometry(350, 170, 5, 5);
@@ -107,7 +113,7 @@ var createRoom3 = function (secret) {
   var wallMesh = new THREE.Mesh(wallGeo, wallMat);
   wallMesh.position.set(0, 85, 175);
   wallMesh.receiveShadow = true;
-  scene.add(wallMesh);
+  levelGeometry.add(wallMesh);
   var wallShape = new CANNON.Plane();
   var wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
@@ -118,7 +124,7 @@ var createRoom3 = function (secret) {
   wallMesh = new THREE.Mesh(wallGeo, wallMat);
   wallMesh.position.set(0, 85, -175);
   wallMesh.receiveShadow = true;
-  scene.add(wallMesh);
+  levelGeometry.add(wallMesh);
   wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.position.set(0, 0, -175);
@@ -130,7 +136,7 @@ var createRoom3 = function (secret) {
   wallMesh = new THREE.Mesh(wallGeo, wallMat);
   wallMesh.position.set(175, 85, 0);
   wallMesh.receiveShadow = true;
-  scene.add(wallMesh);
+  levelGeometry.add(wallMesh);
   wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0),-Math.PI/2);
@@ -140,7 +146,7 @@ var createRoom3 = function (secret) {
   wallMesh = new THREE.Mesh(wallGeo, wallMat);
   wallMesh.position.set(-175, 85, 0);
   wallMesh.receiveShadow = true;
-  scene.add(wallMesh);
+  levelGeometry.add(wallMesh);
   wallBody = new CANNON.Body({ mass: 0 });
   wallBody.addShape(wallShape);
   wallBody.quaternion.setFromAxisAngle(new CANNON.Vec3(0, 1, 0),Math.PI/2);
@@ -156,7 +162,7 @@ var createRoom3 = function (secret) {
   wall.rotation.y = Math.PI/2;
   wall.position.set(75, 20, 175);
   wall.castShadow = true;
-  scene.add( wall );
+  levelGeometry.add( wall );
   boxBody = new CANNON.Body({ mass: 0 });
   boxBody.addShape(boxShape);
   boxBody.position.set(75, 20, 175);
@@ -168,7 +174,7 @@ var createRoom3 = function (secret) {
   wall.rotation.y = Math.PI/2;
   wall.position.set(0, 95, 175);
   wall.castShadow = true;
-  scene.add( wall );
+  levelGeometry.add( wall );
   boxBody = new CANNON.Body({ mass: 0 });
   boxBody.addShape(boxShape);
   boxBody.position.set(0, 95, 175);
@@ -211,7 +217,7 @@ var createRoom3 = function (secret) {
       wall.rotation.y = Math.PI/2;
     } else if (positions[pos][1] != 85) boxShape = new CANNON.Box(new CANNON.Vec3(100,7.5,25));
     wall.castShadow = true;
-    scene.add( wall );
+    levelGeometry.add( wall );
     boxBody = new CANNON.Body({ mass: 0 });
     boxBody.addShape(boxShape);
     boxBody.position.set(positions[pos][0], positions[pos][1], positions[pos][2]);
@@ -228,7 +234,7 @@ var createRoom3 = function (secret) {
   boxShape = new CANNON.Box(new CANNON.Vec3(0.5,85,75));
   wall.rotation.y = Math.PI/2;
   wall.castShadow = true;
-  scene.add( wall );
+  levelGeometry.add( wall );
   boxBody = new CANNON.Body({ mass: 0 });
   boxBody.addShape(boxShape);
   boxBody.position.set(-25, 85, 100);
@@ -238,7 +244,7 @@ var createRoom3 = function (secret) {
   wall.position.set(-100, 85, 25);
   boxShape = new CANNON.Box(new CANNON.Vec3(75,85,0.5));
   wall.castShadow = true;
-  scene.add( wall );
+  levelGeometry.add( wall );
   boxBody = new CANNON.Body({ mass: 0 });
   boxBody.addShape(boxShape);
   boxBody.position.set(-100, 85, 25);
@@ -252,7 +258,7 @@ var createRoom3 = function (secret) {
   boxShape = new CANNON.Box(new CANNON.Vec3(0.1,85,25));
   wall.rotation.y = Math.PI/2;
   wall.castShadow = true;
-  scene.add( wall );
+  levelGeometry.add( wall );
   boxBody = new CANNON.Body({ mass: 0 });
   boxBody.addShape(boxShape);
   boxBody.position.set(25, 85, -150);
@@ -262,7 +268,7 @@ var createRoom3 = function (secret) {
   wall.position.set(150, 85, -25);
   boxShape = new CANNON.Box(new CANNON.Vec3(25,85,0.1));
   wall.castShadow = true;
-  scene.add( wall );
+  levelGeometry.add( wall );
   boxBody = new CANNON.Body({ mass: 0 });
   boxBody.addShape(boxShape);
   boxBody.position.set(150, 85, -25);
@@ -305,7 +311,7 @@ var createRoom3 = function (secret) {
     pillar = new THREE.Mesh( pillargeometry, pillarmaterial );
     pillar.position.set(positions[pos][0], positions[pos][1], positions[pos][2]);
     pillar.castShadow = true;
-    scene.add( pillar );
+    levelGeometry.add( pillar );
     pillarBody = new CANNON.Body({ mass: 0 });
     pillarBody.addShape(pillarShape);
     pillarBody.position.set(positions[pos][0], positions[pos][1], positions[pos][2]);
@@ -334,7 +340,7 @@ var createRoom3 = function (secret) {
   for (var i = 0; i < positions.length; i++) {
     light = new THREE.PointLight( "rgb(241, 148, 61)", 0.4, 80 );
     light.position.set( positions[i][0], 25, positions[i][1] );
-    scene.add( light );
+    levelGeometry.add( light );
     torch = new THREE.Mesh( torchgeometry, torchmaterial );
     torch.position.set( positions[i][0], 25, positions[i][1] );
     scene.add( torch );
@@ -349,7 +355,7 @@ var createRoom3 = function (secret) {
 
   altar = new THREE.Mesh(altargeometry, altarmaterial);
   altar.position.set(110, 2.5, -110);
-  scene.add(altar);
+  levelGeometry.add(altar);
 
   var altarBody = new CANNON.Body({ mass: 0 });
   altarBody.addShape(altarShape);
