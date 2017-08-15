@@ -1,3 +1,3 @@
-# dungeon_escape
+# Dungeon Escape
 
-lets dooooooo disssssss
+A simple, first-person puzzle-exploration game done in WebGl.
